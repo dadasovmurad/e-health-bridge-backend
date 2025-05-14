@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\EHealthBridgeAPI.Application\EHealthBridgeAPI.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\EHealthBridgeAPI.Infrastructure\EHealthBridgeAPI.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Infrastructure\EHealthBridgeAPI.Persistence\EHealthBridgeAPI.Persistence.csproj" />
   </ItemGroup>
 

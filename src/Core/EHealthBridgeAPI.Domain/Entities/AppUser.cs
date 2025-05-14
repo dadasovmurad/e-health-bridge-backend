@@ -16,7 +16,6 @@ namespace EHealthBridgeAPI.Domain.Entities
         public string LastName { get; set; }
         public bool IsActive { get; set; } = true;
        
-
         public AppUser() { }
 
         public AppUser(string username, string email, string passwordHash,

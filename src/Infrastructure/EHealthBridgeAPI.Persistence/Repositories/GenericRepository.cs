@@ -20,8 +20,12 @@ namespace EHealthBridgeAPI.Persistence.Repositories
         public GenericRepository(EHealthBridgeAPIDbContext context)
         {
             _context = context;
-            _tableName = typeof(T).Name + "s";
+            _tableName = typeof(T).Name.ToSnakeCase() + "s";
             _columnNames = typeof(T).GetProperties().Where(p => p.Name != nameof(BaseEntity.Id)).Select(p => p.Name.ToSnakeCase()).ToList();
+        }
+        public GenericRepository()
+        {
+            
         }
         public async Task<IEnumerable<T>> GetAllAsync()
         {
@@ -57,21 +61,31 @@ namespace EHealthBridgeAPI.Persistence.Repositories
 
         public async Task<int> InsertAsync(T model)
         {
-            // Construct the SQL query to insert a new record into the table.
-            var query = $"INSERT INTO {_tableName} ({string.Join(',', _columnNames)}) VALUES (@{string.Join(", @", _columnNames)});" +
+            try
+            {
+                var query = $"INSERT INTO {_tableName} ({string.Join(',', _columnNames)}) VALUES (@{string.Join(", @", _columnNames)});" +
                     // Use SCOPE_IDENTITY() in SQL Server to retrieve the latest generated identity value.
                     // This is used to get the auto-incremented identity value after an INSERT operation.
                     "SELECT CAST(SCOPE_IDENTITY() as int)";
 
-            // Open a database connection.
-            using (var connection = _context.CreateConnection())
-            {
-                // Execute the query asynchronously and retrieve the inserted ID.
-                var id = await connection.QueryFirstOrDefaultAsync<int>(query, model);
+                // Open a database connection.
+                using (var connection = _context.CreateConnection())
+                {
+                    // Execute the query asynchronously and retrieve the inserted ID.
+                    var id = await connection.QueryFirstOrDefaultAsync<int>(query, model);
 
-                // Return the inserted ID.
-                return id;
+                    // Return the inserted ID.
+                    return id;
+                }
+
             }
+            catch (Exception exc)
+            {
+                
+                return int.MinValue;
+            }
+            // Construct the SQL query to insert a new record into the table.
+          
         }
 
         public async Task<bool> UpdateAsync(T model)

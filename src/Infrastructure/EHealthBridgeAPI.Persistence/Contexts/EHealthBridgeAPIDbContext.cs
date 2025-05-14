@@ -17,7 +17,7 @@ namespace EHealthBridgeAPI.Persistence.Contexts.Dapper
         public EHealthBridgeAPIDbContext(IConfiguration configuration)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _connectionString = _configuration.GetConnectionString("PostgreSQL");
         }
 
         public IDbConnection CreateConnection()

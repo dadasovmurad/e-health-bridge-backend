@@ -1,4 +1,5 @@
 using EHealthBridgeAPI.Persistence;
+using EHealthBridgeAPI.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -18,6 +19,7 @@ namespace EHealthBridgeAPI.API
 
             services.AddControllers();
             services.AddPersistenceServices();
+            services.AddInfrastructureServices();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer("Admin", options =>
@@ -37,8 +39,11 @@ namespace EHealthBridgeAPI.API
                     NameClaimType = ClaimTypes.Name //JWT üzerinde Name claimne karþýlýk gelen deðeri User.Identity.Name propertysinden elde edebiliriz.
                 };
             });
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
             var app = builder.Build();
-
+            app.UseSwagger();
+            app.UseSwaggerUI();
             // Configure the HTTP request pipeline.
 
             app.UseHttpsRedirection();
