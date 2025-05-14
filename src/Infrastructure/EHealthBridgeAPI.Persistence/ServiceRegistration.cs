@@ -20,7 +20,7 @@ namespace EHealthBridgeAPI.Persistence
             services.AddSingleton<EHealthBridgeAPIDbContext>();
             services.AddScoped<IUserManager,UserManager>();
             services.AddScoped<IUserService,UserService>();
-            //services.AddScoped<IGenericRepository,GenericRepository>();
+            //services.AddScoped<IGenericRepository, GenericRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             //services.AddAutoMapper(Assembly.GetExecutingAssembly());

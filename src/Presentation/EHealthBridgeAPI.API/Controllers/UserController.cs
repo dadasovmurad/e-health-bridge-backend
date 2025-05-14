@@ -87,7 +87,9 @@ namespace EHealthBridgeAPI.API.Controllers
 
             existingUser.FirstName = request.FirstName;
             existingUser.LastName = request.LastName;
-
+            existingUser.Username = request.Username;
+            existingUser.Email = request.Email;
+            
             var updated = await _userService.UpdateUserAsync(existingUser);
 
             if (!updated)

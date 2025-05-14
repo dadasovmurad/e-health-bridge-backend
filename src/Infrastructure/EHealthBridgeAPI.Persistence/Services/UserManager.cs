@@ -21,8 +21,8 @@ namespace EHealthBridgeAPI.Persistence.Services
         public async Task<int> RegisterUserAsync(AppUser user, string rawPassword)
         {
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(rawPassword);
-            user.CreatedAt = DateTimeOffset.UtcNow;
-            user.UpdatedAt = DateTimeOffset.UtcNow;
+            user.CreatedAt = DateTime.Now;
+            user.UpdatedAt = DateTime.Now;
 
             return await _userService.CreateUserAsync(user);
         }

@@ -1,17 +1,17 @@
 ﻿using Dapper;
 using EHealthBridgeAPI.Application.Extensions;
 using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.Utilities;
 using EHealthBridgeAPI.Domain.Entities.Common;
 using EHealthBridgeAPI.Persistence.Contexts.Dapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace EHealthBridgeAPI.Persistence.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity, new()
     {
         private readonly EHealthBridgeAPIDbContext _context;
         private readonly string _tableName;
@@ -20,107 +20,80 @@ namespace EHealthBridgeAPI.Persistence.Repositories
         public GenericRepository(EHealthBridgeAPIDbContext context)
         {
             _context = context;
-            _tableName = typeof(T).Name.ToSnakeCase() + "s";
-            _columnNames = typeof(T).GetProperties().Where(p => p.Name != nameof(BaseEntity.Id)).Select(p => p.Name.ToSnakeCase()).ToList();
+
+            // Get the table name from [Table] attribute, if present
+            var tableAttr = typeof(T).GetCustomAttribute<TableAttribute>();
+            _tableName = tableAttr?.Name ?? (typeof(T).Name.ToSnakeCase() + "s");
+
+            // Get column names from [Column] attribute or fallback to snake_case
+            _columnNames = typeof(T)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.Name != nameof(BaseEntity.Id))
+                .Select(p =>
+                {
+                    var columnAttr = p.GetCustomAttribute<ColumnAttribute>();
+                    var columnName = columnAttr?.Name ?? p.Name.ToSnakeCase();
+                    return $"\"{columnName}\"";
+                })
+                .ToList();
         }
-        public GenericRepository()
+
+        public async Task<int> InsertAsync(T entity)
         {
-            
+            var param = DapperParamBuilder.BuildParameters(entity);
+
+            var columns = string.Join(", ", _columnNames); // "email", "created_at"
+            var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"'))); // @email, @created_at
+
+            var sql = $@"
+                INSERT INTO {_tableName} ({columns})
+                VALUES ({parameters})
+                RETURNING id;
+            ";
+
+            using var connection = _context.CreateConnection();
+            return await connection.ExecuteScalarAsync<int>(sql, param);
         }
+
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            // Construct the SQL query to select all records from the table.
-            var query = $"SELECT * FROM {_tableName}";
+            var sql = $"SELECT * FROM {_tableName}";
+            using var connection = _context.CreateConnection();
 
-            // Open a database connection.
-            using (var connection = _context.CreateConnection())
-            {
-                // Execute the query asynchronously and retrieve the results.
-                var result = await connection.QueryAsync<T>(query);
-
-                // Return the retrieved entities.
-                return result;
-            }
+            var rawRows = await connection.QueryAsync(sql); // dynamic
+            return SnakeCaseMapper.MapTo<T>(rawRows);
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            // Construct the SQL query to select a record by its ID from the table.
-            var query = $"SELECT * FROM {_tableName} WHERE id = @Id";
-
-            // Open a database connection.
-            using (var connection = _context.CreateConnection())
-            {
-                // Execute the query asynchronously and retrieve the result.
-                var result = await connection.QuerySingleOrDefaultAsync<T>(query, new { Id = id });
-
-                // Return the retrieved entity (or null if not found).
-                return result;
-            }
+            var sql = $"SELECT * FROM {_tableName} WHERE id = @id";
+            using var connection = _context.CreateConnection();
+            var rawRows = await connection.QueryFirstOrDefaultAsync(sql, new { id });
+            return SnakeCaseMapper.MapTo<T>(rawRows);
         }
 
-        public async Task<int> InsertAsync(T model)
+        public async Task<bool> UpdateAsync(T entity)
         {
-            try
-            {
-                var query = $"INSERT INTO {_tableName} ({string.Join(',', _columnNames)}) VALUES (@{string.Join(", @", _columnNames)});" +
-                    // Use SCOPE_IDENTITY() in SQL Server to retrieve the latest generated identity value.
-                    // This is used to get the auto-incremented identity value after an INSERT operation.
-                    "SELECT CAST(SCOPE_IDENTITY() as int)";
+            var param = DapperParamBuilder.BuildParameters(entity);
 
-                // Open a database connection.
-                using (var connection = _context.CreateConnection())
-                {
-                    // Execute the query asynchronously and retrieve the inserted ID.
-                    var id = await connection.QueryFirstOrDefaultAsync<int>(query, model);
+            var setClause = string.Join(", ", _columnNames.Select(c => $"{c} = @{c.Trim('"')}"));
+            var sql = $@"
+                UPDATE {_tableName}
+                SET {setClause}
+                WHERE id = @Id
+                ";
 
-                    // Return the inserted ID.
-                    return id;
-                }
-
-            }
-            catch (Exception exc)
-            {
-                
-                return int.MinValue;
-            }
-            // Construct the SQL query to insert a new record into the table.
-          
-        }
-
-        public async Task<bool> UpdateAsync(T model)
-        {
-            // Generate SET clause for the SQL query based on column names.
-            var setValues = _columnNames.Select(prop => $"{prop} = @{prop}");
-
-            // Construct the SQL query to update the record in the table.
-            var query = $"UPDATE {_tableName} SET {string.Join(", ", setValues)} WHERE id = @Id";
-
-            // Open a database connection.
-            using (var connection = _context.CreateConnection())
-            {
-                // Execute the query asynchronously and retrieve the result.
-                var result = await connection.ExecuteAsync(query, model);
-
-                // Return true if at least one record was affected; otherwise, return false.
-                return result > 0;
-            }
+            using var connection = _context.CreateConnection();
+            var affected = await connection.ExecuteAsync(sql, param);
+            return affected > 0;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            // Construct the SQL query to delete the record from the table.
-            var query = $"DELETE FROM {_tableName} WHERE id = @Id";
-
-            // Open a database connection.
-            using (var connection = _context.CreateConnection())
-            {
-                // Execute the query asynchronously and retrieve the result.
-                var result = await connection.ExecuteAsync(query, new { Id = id });
-
-                // Return true if at least one record was affected; otherwise, return false.
-                return result > 0;
-            }
+            var sql = $"DELETE FROM {_tableName} WHERE id = @id";
+            using var connection = _context.CreateConnection();
+            var affected = await connection.ExecuteAsync(sql, new { id });
+            return affected > 0;
         }
     }
 }
