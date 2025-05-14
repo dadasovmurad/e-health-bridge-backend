@@ -1,6 +1,7 @@
 ﻿
 using Core.Results;
 using EHealthBridgeAPI.Application.Abstractions.Services;
+using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -36,11 +37,11 @@ namespace EHealthBridgeAPI.Persistence.Services
                 var user = usersDataResult.Data.FirstOrDefault(u => u.Username == username);
 
                 if (user == null || !BCrypt.Net.BCrypt.Verify(rawPassword, user.PasswordHash))
-                    return new ErrorDataResult<AppUser?>();
+                    return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
 
-                return new SuccessDataResult<AppUser?>();
+                return new SuccessDataResult<AppUser?>(user,Messages.LoginSuccess);
             }
-            return new ErrorDataResult<AppUser?>();
+            return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
         }
     }
 }

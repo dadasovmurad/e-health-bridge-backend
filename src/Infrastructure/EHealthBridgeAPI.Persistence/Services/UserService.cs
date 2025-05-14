@@ -1,5 +1,6 @@
 ﻿using Core.Results;
 using EHealthBridgeAPI.Application.Abstractions.Services;
+using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
 using System;
@@ -31,26 +32,54 @@ namespace EHealthBridgeAPI.Persistence.Services
         {
             var userById = await _userRepository.GetByIdAsync(id);
 
-            return new SuccessDataResult<AppUser?>(userById);
+            if (userById != null)
+            {
+                return new SuccessDataResult<AppUser?>(userById);
+            }
+            else
+            {
+                return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
+            }
+
         }
 
         public async Task<IDataResult<int>> CreateAsync(AppUser user)
         {
             var createdUser = await _userRepository.InsertAsync(user);
-            
-            return new SuccessDataResult<int>(createdUser);
+            if (createdUser == 0)
+            {
+                return new ErrorDataResult<int>(Messages.UserNotCreated);
+            }
+            else
+            {
+                return new SuccessDataResult<int>(Messages.Usercreated);
+            }
         }
 
         public async Task<Result> UpdateAsync(AppUser user)
         {
             var updatedStatus = await _userRepository.UpdateAsync(user);
-            return new SuccessResult();
+            if (!updatedStatus)
+            {
+                return new ErrorResult(Messages.UserNotUpdated);
+            }
+            else
+            {
+                return new SuccessResult(Messages.UserUpdated);
+            }
         }
 
         public async Task<Result> RemoveByIdAsync(int id)
         {
             var deletedStatus = await _userRepository.DeleteAsync(id);
-            return new SuccessResult();
+            if (!deletedStatus)
+            {
+                return new ErrorResult(Messages.UserNotDeleted);
+            }
+            else
+            {
+                return new SuccessResult(Messages.UserDeleted);
+            }
         }
     }
 }
