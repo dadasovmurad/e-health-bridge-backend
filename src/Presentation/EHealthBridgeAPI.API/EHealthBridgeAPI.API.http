@@ -1,0 +1,6 @@
+@EHealthBridgeAPI.API_HostAddress = http://localhost:5139
+
+GET {{EHealthBridgeAPI.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
