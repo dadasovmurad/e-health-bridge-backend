@@ -1,4 +1,5 @@
-﻿using EHealthBridgeAPI.Domain.Entities;
+﻿using Core.Results;
+using EHealthBridgeAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace EHealthBridgeAPI.Application.Abstractions.Services
 {
     public interface IUserManager
     {
-        Task<int> RegisterUserAsync(AppUser user, string rawPassword);
-        Task<AppUser?> AuthenticateUserAsync(string username, string rawPassword);
+        Task<IDataResult<int>> RegisterUserAsync(AppUser user, string rawPassword);
+        Task<IDataResult<AppUser>?> AuthenticateUserAsync(string username, string rawPassword);
     }
 }

@@ -22,99 +22,99 @@ namespace EHealthBridgeAPI.API.Controllers
             _tokenHandler = tokenHandler;
         }
 
-        // Register a new user
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            if (request == null)
-                return BadRequest("Invalid request.");
+        //// Register a new user
+        //[HttpPost("register")]
+        //public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        //{
+        //    if (request == null)
+        //        return BadRequest("Invalid request.");
 
-            // Check if username or email already exists
-            var existingUser = await _userService.GetAllUsersAsync();
-            if (existingUser.Any(u => u.Username == request.Username))
-                return Conflict("Username already exists.");
-            if (existingUser.Any(u => u.Email == request.Email))
-                return Conflict("Email already exists.");
+        //    // Check if username or email already exists
+        //    var existingUser = await _userService.GetAllAsync();
+        //    if (existingUser.Any(u => u.Username == request.Username))
+        //        return Conflict("Username already exists.");
+        //    if (existingUser.Any(u => u.Email == request.Email))
+        //        return Conflict("Email already exists.");
 
-            // Register user
-            var newUser = new AppUser
-            {
-                Username = request.Username,
-                Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName
-            };
+        //    // Register user
+        //    var newUser = new AppUser
+        //    {
+        //        Username = request.Username,
+        //        Email = request.Email,
+        //        FirstName = request.FirstName,
+        //        LastName = request.LastName
+        //    };
 
-            var userId = await _userManager.RegisterUserAsync(newUser, request.Password);
+        //    var userId = await _userManager.RegisterUserAsync(newUser, request.Password);
 
-            return CreatedAtAction(nameof(GetUser), new { id = userId }, newUser);
-        }
+        //    return CreatedAtAction(nameof(GetUser), new { id = userId }, newUser);
+        //}
 
-        // Authenticate user (login)
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            var user = await _userManager.AuthenticateUserAsync(request.Username, request.Password);
+        //// Authenticate user (login)
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        //{
+        //    var user = await _userManager.AuthenticateUserAsync(request.Username, request.Password);
 
-            if (user == null)
-                return Unauthorized("Invalid username or password.");
+        //    if (user == null)
+        //        return Unauthorized("Invalid username or password.");
 
-            var token = _tokenHandler.CreateAccessToken(3600, user);
+        //    var token = _tokenHandler.CreateAccessToken(3600, user);
 
-            return Ok(new { Message = "Login successful", Token = token });
-        }
+        //    return Ok(new { Message = "Login successful", Token = token });
+        //}
 
-        // Get user by ID
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
-        {
-            var user = await _userService.GetUserByIdAsync(id);
+        //// Get user by ID
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetUser(int id)
+        //{
+        //    var user = await _userService.GetByIdAsync(id);
 
-            if (user == null)
-                return NotFound("User not found.");
+        //    if (user == null)
+        //        return NotFound("User not found.");
 
-            return Ok(user);
-        }
+        //    return Ok(user);
+        //}
 
-        // Update user details
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
-        {
-            var existingUser = await _userService.GetUserByIdAsync(id);
+        //// Update user details
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
+        //{
+        //    var existingUser = await _userService.GetByIdAsync(id);
 
-            if (existingUser == null)
-                return NotFound("User not found.");
+        //    if (existingUser == null)
+        //        return NotFound("User not found.");
 
-            existingUser.FirstName = request.FirstName;
-            existingUser.LastName = request.LastName;
-            existingUser.Username = request.Username;
-            existingUser.Email = request.Email;
+        //    existingUser.FirstName = request.FirstName;
+        //    existingUser.LastName = request.LastName;
+        //    existingUser.Username = request.Username;
+        //    existingUser.Email = request.Email;
             
-            var updated = await _userService.UpdateUserAsync(existingUser);
+        //    var updated = await _userService.UpdateUserAsync(existingUser);
 
-            if (!updated)
-                return BadRequest("Failed to update user.");
+        //    if (!updated)
+        //        return BadRequest("Failed to update user.");
 
-            return Ok(existingUser);
-        }
+        //    return Ok(existingUser);
+        //}
 
-        // Delete user
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            var deleted = await _userService.DeleteUserAsync(id);
+        //// Delete user
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteUser(int id)
+        //{
+        //    var deleted = await _userService.RemoveByIdAsync(id);
 
-            if (!deleted)
-                return NotFound("User not found.");
+        //    if (!deleted)
+        //        return NotFound("User not found.");
 
-            return NoContent();
-        }
-        [Authorize(AuthenticationSchemes = "Admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
-        }
+        //    return NoContent();
+        //}
+        //[Authorize(AuthenticationSchemes = "Admin")]
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllUsers()
+        //{
+        //    var users = await _userService.GetAllAsync();
+        //    return Ok(users);
+        //}
     }
 }

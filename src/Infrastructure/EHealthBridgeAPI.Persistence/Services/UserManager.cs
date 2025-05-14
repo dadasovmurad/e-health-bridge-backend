@@ -1,4 +1,5 @@
 ﻿
+using Core.Results;
 using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Domain.Entities;
 using System;
@@ -18,24 +19,28 @@ namespace EHealthBridgeAPI.Persistence.Services
             _userService = userService;
         }
 
-        public async Task<int> RegisterUserAsync(AppUser user, string rawPassword)
+        public async Task<IDataResult<int>> RegisterUserAsync(AppUser user, string rawPassword)
         {
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(rawPassword);
             user.CreatedAt = DateTime.Now;
             user.UpdatedAt = DateTime.Now;
 
-            return await _userService.CreateUserAsync(user);
+            return await _userService.CreateAsync(user);
         }
 
-        public async Task<AppUser?> AuthenticateUserAsync(string username, string rawPassword)
+        public async Task<IDataResult<AppUser?>> AuthenticateUserAsync(string username, string rawPassword)
         {
-            var users = await _userService.GetAllUsersAsync();
-            var user = users.FirstOrDefault(u => u.Username == username);
+            var usersDataResult = await _userService.GetAllAsync();
+            if (usersDataResult.Success)
+            {
+                var user = usersDataResult.Data.FirstOrDefault(u => u.Username == username);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(rawPassword, user.PasswordHash))
-                return null;
+                if (user == null || !BCrypt.Net.BCrypt.Verify(rawPassword, user.PasswordHash))
+                    return new ErrorDataResult<AppUser?>();
 
-            return user;
+                return new SuccessDataResult<AppUser?>();
+            }
+            return new ErrorDataResult<AppUser?>();
         }
     }
 }

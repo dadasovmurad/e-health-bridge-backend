@@ -1,8 +1,11 @@
-﻿using EHealthBridgeAPI.Application.Abstractions.Services;
+﻿using Core.Results;
+using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,19 +21,36 @@ namespace EHealthBridgeAPI.Persistence.Services
             _userRepository = userRepository;
         }
 
-        public Task<IEnumerable<AppUser>> GetAllUsersAsync()
-            => _userRepository.GetAllAsync();
+        public async Task<IDataResult<IEnumerable<AppUser>>> GetAllAsync()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return new SuccessDataResult<IEnumerable<AppUser>>(users);
+        }
 
-        public Task<AppUser?> GetUserByIdAsync(int id)
-            => _userRepository.GetByIdAsync(id);
+        public async Task<IDataResult<AppUser?>> GetByIdAsync(int id)
+        {
+            var userById = await _userRepository.GetByIdAsync(id);
 
-        public Task<int> CreateUserAsync(AppUser user)
-            => _userRepository.InsertAsync(user);
+            return new SuccessDataResult<AppUser?>(userById);
+        }
 
-        public Task<bool> UpdateUserAsync(AppUser user)
-            => _userRepository.UpdateAsync(user);
+        public async Task<IDataResult<int>> CreateAsync(AppUser user)
+        {
+            var createdUser = await _userRepository.InsertAsync(user);
+            
+            return new SuccessDataResult<int>(createdUser);
+        }
 
-        public Task<bool> DeleteUserAsync(int id)
-            => _userRepository.DeleteAsync(id);
+        public async Task<Result> UpdateAsync(AppUser user)
+        {
+            var updatedStatus = await _userRepository.UpdateAsync(user);
+            return new SuccessResult();
+        }
+
+        public async Task<Result> RemoveByIdAsync(int id)
+        {
+            var deletedStatus = await _userRepository.DeleteAsync(id);
+            return new SuccessResult();
+        }
     }
 }
