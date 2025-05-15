@@ -28,7 +28,6 @@ namespace EHealthBridgeAPI.API.Extensions
                 var statusCode = ex switch
                 {
                     NotFoundException => StatusCodes.Status404NotFound,
-                    UnauthorizedException => StatusCodes.Status401Unauthorized,
                     _ => StatusCodes.Status500InternalServerError
                 };
 
@@ -57,11 +56,6 @@ namespace EHealthBridgeAPI.API.Extensions
         public class NotFoundException : Exception
         {
             public NotFoundException(string message) : base(message) { }
-        }
-
-        public class UnauthorizedException : Exception
-        {
-            public UnauthorizedException(string message) : base(message) { }
         }
     }
 }
