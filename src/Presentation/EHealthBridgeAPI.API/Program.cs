@@ -55,6 +55,9 @@ namespace EHealthBridgeAPI.API
 
             // app.UseHttpsRedirection(); // optional, for HTTP to HTTPS
 
+            //global exception middleware
+            app.UseGlobalExceptionMiddleware();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
