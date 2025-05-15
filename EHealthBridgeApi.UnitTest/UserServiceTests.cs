@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.Results;
+﻿using Core.Results;
 using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;

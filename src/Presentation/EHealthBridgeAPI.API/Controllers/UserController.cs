@@ -22,6 +22,11 @@ namespace EHealthBridgeAPI.API.Controllers
             _userService = userService;
             _tokenHandler = tokenHandler;
         }
+        [HttpGet("test")]
+        public async Task<IActionResult> Test()
+        {
+            return (Ok("Api is working"));
+        }
 
         // Register a new user
         [HttpPost("register")]
