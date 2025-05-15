@@ -1,5 +1,6 @@
 ﻿using Core.Results;
 using EHealthBridgeAPI.Application.Constant;
+using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
 using EHealthBridgeAPI.Persistence.Services;
@@ -152,6 +153,92 @@ namespace EHealthBridgeApi.UnitTest
             Assert.True(result.Success);
             Assert.IsType<SuccessResult>(result);
             Assert.Equal(Messages.UserDeleted, result.Message);
+        }
+
+        [Fact]
+        public async Task GetByEmailOrName_ReturnsError_WhenUsernameAndEmailAreEmpty()
+        {
+            // Arrange
+            var request = new RegisterRequest { Username = "", Email = "" };
+
+            // Act
+            var result = await _userService.GetByEmailOrName(request);
+
+            // Assert
+            Assert.False(result.Success);
+            Assert.Equal(Messages.InvalidRequest, result.Message);
+            Assert.Null(result.Data);
+        }
+
+        [Fact]
+        public async Task GetByEmailOrName_ReturnsError_WhenUsernameAlreadyExists()
+        {
+            // Arrange
+            var existingUsers = new List<AppUser>
+        {
+            new AppUser { Username = "existingUser", Email = "existing@mail.com" }
+        };
+
+            _userRepositoryMock
+                .Setup(repo => repo.GetAllAsync())
+                .ReturnsAsync(existingUsers);
+
+            var request = new RegisterRequest { Username = "existingUser", Email = "new@mail.com" };
+
+            // Act
+            var result = await _userService.GetByEmailOrName(request);
+
+            // Assert
+            Assert.False(result.Success);
+            Assert.Equal(Messages.UserNotCreated, result.Message);
+            Assert.Null(result.Data);
+        }
+
+        [Fact]
+        public async Task GetByEmailOrName_ReturnsError_WhenEmailAlreadyExists()
+        {
+            // Arrange
+            var existingUsers = new List<AppUser>
+        {
+            new AppUser { Username = "anotherUser", Email = "existing@mail.com" }
+        };
+
+            _userRepositoryMock
+                .Setup(repo => repo.GetAllAsync())
+                .ReturnsAsync(existingUsers);
+
+            var request = new RegisterRequest { Username = "newUser", Email = "existing@mail.com" };
+
+            // Act
+            var result = await _userService.GetByEmailOrName(request);
+
+            // Assert
+            Assert.False(result.Success);
+            Assert.Equal(Messages.UserNotCreated, result.Message);
+            Assert.Null(result.Data);
+        }
+
+        [Fact]
+        public async Task GetByEmailOrName_ReturnsSuccess_WhenUsernameAndEmailAreUnique()
+        {
+            // Arrange
+            var existingUsers = new List<AppUser>
+        {
+            new AppUser { Username = "user1", Email = "user1@mail.com" }
+        };
+
+            _userRepositoryMock
+                .Setup(repo => repo.GetAllAsync())
+                .ReturnsAsync(existingUsers);
+
+            var request = new RegisterRequest { Username = "uniqueUser", Email = "unique@mail.com" };
+
+            // Act
+            var result = await _userService.GetByEmailOrName(request);
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.Equal(null, result.Data);
         }
     }
 }
