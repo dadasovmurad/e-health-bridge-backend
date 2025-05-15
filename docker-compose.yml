@@ -1,16 +1,16 @@
 version: '3.9'
-
+ 
 services:
   ehealth-api:
     image: ehealth-api
     build: .
     ports:
-      - "8080:8080"
+      - "8080:8080"  # .NET API accessible at http://localhost:8080
     depends_on:
       - db
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=ehealthdb;Username=postgres;Password=0552499379
-
+ 
   db:
     image: postgres:15
     environment:
@@ -21,6 +21,19 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-
+ 
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8081:80"  # pgAdmin accessible at http://localhost:8081
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+ 
 volumes:
   pgdata:
+  pgadmin_data:
