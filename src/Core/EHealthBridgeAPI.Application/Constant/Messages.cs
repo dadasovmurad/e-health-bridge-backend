@@ -10,6 +10,8 @@ namespace EHealthBridgeAPI.Application.Constant
     {
         public static string UserNotFound = "İstifadəçi tapilmadi";
         public static string LoginSuccess = "Login oldunuz";
+        public static string InvalidRequest = "Invalid request";
+
 
         public static string UserNotCreated = "İstifadəçi qeydiyyata alınmadı";
         public static string Usercreated = "İstifadəçi qeydə alındı";

@@ -1,6 +1,7 @@
 ﻿using Core.Results;
 using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Constant;
+using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
 using System;
@@ -26,6 +27,21 @@ namespace EHealthBridgeAPI.Persistence.Services
         {
             var users = await _userRepository.GetAllAsync();
             return new SuccessDataResult<IEnumerable<AppUser>>(users);
+        }
+
+        public async Task<IDataResult<AppUser?>> GetByEmailOrName(RegisterRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Username) && string.IsNullOrEmpty(request.Email))
+                return new ErrorDataResult<AppUser?>(Messages.InvalidRequest);
+
+            var existingUser = await GetAllAsync();
+
+            var user = existingUser.Data;
+            if (user.Any(u => u.Username == request.Username))
+                return new ErrorDataResult<AppUser?>(Messages.UserNotCreated);
+            if (user.Any(u => u.Email == request.Email))
+                return new ErrorDataResult<AppUser?>(Messages.UserNotCreated);
+            return new SuccessDataResult<AppUser?>();
         }
 
         public async Task<IDataResult<AppUser?>> GetByIdAsync(int id)

@@ -1,4 +1,6 @@
-﻿using EHealthBridgeAPI.Application.Abstractions.Token;
+﻿using Core.Results;
+using EHealthBridgeAPI.Application.Abstractions.Token;
+using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -22,7 +24,7 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
             _configuration = configuration;
         }
 
-        public Application.DTOs.Token CreateAccessToken(int second, AppUser user)
+        public async Task<IDataResult<Application.DTOs.Token>>  CreateAccessToken(int second, AppUser user)
         {
             Application.DTOs.Token token = new();
 
@@ -47,7 +49,7 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
 
             //string refreshToken = CreateRefreshToken();
 
-            return token;
+            return new SuccessDataResult<Application.DTOs.Token>(token, Messages.LoginSuccess);
         }
     }
 }

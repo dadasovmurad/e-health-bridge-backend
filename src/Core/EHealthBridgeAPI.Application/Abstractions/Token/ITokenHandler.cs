@@ -1,4 +1,5 @@
-﻿using EHealthBridgeAPI.Domain.Entities;
+﻿using Core.Results;
+using EHealthBridgeAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace EHealthBridgeAPI.Application.Abstractions.Token
 {
     public interface ITokenHandler
     {
-        DTOs.Token CreateAccessToken(int second, AppUser appUser);
+        Task<IDataResult<Application.DTOs.Token?>> CreateAccessToken(int second, AppUser appUser);
     }
 }

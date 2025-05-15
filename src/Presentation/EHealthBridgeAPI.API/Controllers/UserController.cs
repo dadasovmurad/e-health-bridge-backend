@@ -1,4 +1,5 @@
-﻿using EHealthBridgeAPI.Application.Abstractions.Services;
+﻿using Core.Results;
+using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Abstractions.Token;
 using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.DTOs.User;
@@ -11,12 +12,12 @@ namespace EHealthBridgeAPI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserManager _userManager;
         private readonly IUserService _userService;
         private readonly ITokenHandler _tokenHandler;
-        public UserController(IUserManager userManager, IUserService userService, ITokenHandler tokenHandler)
+        public UsersController(IUserManager userManager, IUserService userService, ITokenHandler tokenHandler)
         {
             _userManager = userManager;
             _userService = userService;
@@ -32,16 +33,12 @@ namespace EHealthBridgeAPI.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            if (request == null)
-                return BadRequest("Invalid request.");
+            var existingUser = await _userService.GetByEmailOrName(request);
 
-            // Check if username or email already exists
-            var existingUser = await _userService.GetAllAsync();
-            var user = existingUser.Data;
-            if (user.Any(u => u.Username == request.Username))
-                return Conflict("Username already exists.");
-            if (user.Any(u => u.Email == request.Email))
-                return Conflict("Email already exists.");
+            if (!existingUser.Success)
+            {
+                return Ok(existingUser);
+            }
 
             // Register user
             var newUser = new AppUser
@@ -55,8 +52,6 @@ namespace EHealthBridgeAPI.API.Controllers
             var userId = await _userManager.RegisterUserAsync(newUser, request.Password);
 
             return Ok(userId);
-
-            //return CreatedAtAction(nameof(GetUser), new { id = userId }, newUser);
         }
 
         //// Authenticate user (login)
@@ -70,7 +65,7 @@ namespace EHealthBridgeAPI.API.Controllers
 
             var token = _tokenHandler.CreateAccessToken(3600, user.Data);
 
-            return Ok(new { Message = Messages.LoginSuccess, Token = token });
+            return Ok(token);
         }
 
         //// Get user by ID
@@ -78,7 +73,7 @@ namespace EHealthBridgeAPI.API.Controllers
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await _userService.GetByIdAsync(id);
-                
+
             return Ok(user);
         }
 
