@@ -5,22 +5,63 @@ services:
     image: ehealth-api
     build: .
     ports:
-      - "8080:8080"
+      - "8080:8080"  # .NET API accessible at http://localhost:8080
     depends_on:
       - db
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=ehealthdb;Username=postgres;Password=0552499379
-
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=e_health_bridge_db;Username=postgres;Password=newpassword
   db:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 0552499379
-      POSTGRES_DB: ehealthdb
+      POSTGRES_PASSWORD: newpassword
+      POSTGRES_DB: e_health_bridge_db
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8081:80"  # pgAdmin accessible at http://localhost:8081
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  db-init:
+    image: postgres:15
+    depends_on:
+      - db
+    entrypoint: >
+      bash -c "
+      echo 'Waiting for PostgreSQL...';
+      until pg_isready -h db -p 5432 -U postgres; do
+        sleep 2;
+      done;
+      echo 'Running init SQL...';
+      psql -h db -U postgres -d e_health_bridge_db -c \"
+        CREATE TABLE IF NOT EXISTS public.app_users (
+          id integer NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+          username text NOT NULL,
+          email text NOT NULL,
+          password_hash text NOT NULL,
+          first_name text NOT NULL,
+          last_name text NOT NULL,
+          is_active boolean NOT NULL DEFAULT true,
+          created_at timestamp with time zone NOT NULL,
+          updated_at timestamp with time zone NOT NULL
+        );
+      \"
+      "
+    environment:
+      PGPASSWORD: newpassword
+
 volumes:
   pgdata:
+  pgadmin_data:

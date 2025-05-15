@@ -78,7 +78,7 @@ namespace EHealthBridgeAPI.API.Controllers
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await _userService.GetByIdAsync(id);
-
+                
             return Ok(user);
         }
 
