@@ -10,7 +10,7 @@ services:
       - db
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
-        - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=e_health_bridge_db;Username=postgres;Password=newpassword
+        - ConnectionStrings__PostgreSQL=Host=db;Port=5432;Database=e_health_bridge_db;Username=postgres;Password=newpassword
   db:
     image: postgres:15
     environment:

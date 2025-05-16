@@ -24,9 +24,9 @@ namespace EHealthBridgeAPI.API.Controllers
             _tokenHandler = tokenHandler;
         }
         [HttpGet("test")]
-        public async Task<IActionResult> Test()
+        public IActionResult Test()
         {
-            return (Ok("Api is working"));
+            return Ok("Api is working");
         }
 
         // Register a new user
@@ -85,6 +85,7 @@ namespace EHealthBridgeAPI.API.Controllers
 
             if (!existingUser.Success)
                 return NotFound(Messages.UserNotFound);
+
             var user = existingUser.Data;
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
