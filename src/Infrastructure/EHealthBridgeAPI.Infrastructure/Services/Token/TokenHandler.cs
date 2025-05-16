@@ -24,9 +24,9 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
             _configuration = configuration;
         }
 
-        public async Task<IDataResult<Application.DTOs.Token>>  CreateAccessToken(int second, AppUser user)
+        public Application.DTOs.TokenDto  CreateAccessToken(int second, AppUser user)
         {
-            Application.DTOs.Token token = new();
+            Application.DTOs.TokenDto token = new();
 
             SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]));
 
@@ -49,7 +49,7 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
 
             //string refreshToken = CreateRefreshToken();
 
-            return new SuccessDataResult<Application.DTOs.Token>(token, Messages.LoginSuccess);
+            return token;
         }
     }
 }

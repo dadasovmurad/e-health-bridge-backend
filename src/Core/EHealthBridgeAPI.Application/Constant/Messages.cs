@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace EHealthBridgeAPI.Application.Constant
     {
         public static string UserNotFound = "İstifadəçi tapilmadi";
         public static string LoginSuccess = "Login oldunuz";
+        public static string LoginFailure = "Username or password incorrect";
+
         public static string InvalidRequest = "Invalid request";
 
 

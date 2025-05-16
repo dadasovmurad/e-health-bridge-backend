@@ -32,7 +32,7 @@ namespace EHealthBridgeAPI.Persistence.Services
         public async Task<IDataResult<AppUser?>> AuthenticateUserAsync(string username, string rawPassword)
         {
             var usersDataResult = await _userService.GetAllAsync();
-            if (usersDataResult.Success)
+            if (usersDataResult.IsSuccess)
             {
                 var user = usersDataResult.Data.FirstOrDefault(u => u.Username == username);
 

@@ -10,6 +10,6 @@ namespace EHealthBridgeAPI.Application.Abstractions.Token
 {
     public interface ITokenHandler
     {
-        Task<IDataResult<Application.DTOs.Token?>> CreateAccessToken(int second, AppUser appUser);
+        Application.DTOs.TokenDto CreateAccessToken(int second, AppUser appUser);
     }
 }

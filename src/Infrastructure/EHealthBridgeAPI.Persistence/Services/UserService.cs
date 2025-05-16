@@ -1,6 +1,7 @@
 ﻿using Core.Results;
 using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Constant;
+using EHealthBridgeAPI.Application.DTOs;
 using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
@@ -16,9 +17,9 @@ namespace EHealthBridgeAPI.Persistence.Services
 {
     public class UserService : IUserService
     {
-        private readonly IGenericRepository<AppUser> _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(IGenericRepository<AppUser> userRepository)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -26,37 +27,29 @@ namespace EHealthBridgeAPI.Persistence.Services
         public async Task<IDataResult<IEnumerable<AppUser>>> GetAllAsync()
         {
             var users = await _userRepository.GetAllAsync();
+
             return new SuccessDataResult<IEnumerable<AppUser>>(users);
         }
 
-        public async Task<IDataResult<AppUser?>> GetByEmailOrName(RegisterRequest request)
+        public async Task<IDataResult<AppUser?>> GetByEmailOrUsername(string emailOrUsername)
         {
-            if (string.IsNullOrEmpty(request.Username) && string.IsNullOrEmpty(request.Email))
-                return new ErrorDataResult<AppUser?>(Messages.InvalidRequest);
-
-            var existingUser = await GetAllAsync();
-
-            var user = existingUser.Data;
-            if (user.Any(u => u.Username == request.Username))
-                return new ErrorDataResult<AppUser?>(Messages.UserNotCreated);
-            if (user.Any(u => u.Email == request.Email))
-                return new ErrorDataResult<AppUser?>(Messages.UserNotCreated);
-            return new SuccessDataResult<AppUser?>();
+            var requestUser = await _userRepository.GetByEmailOrUsernameAsync(emailOrUsername);
+            if (requestUser is null)
+            {
+                return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
+            }
+            return new SuccessDataResult<AppUser?>(requestUser);
         }
 
         public async Task<IDataResult<AppUser?>> GetByIdAsync(int id)
         {
             var userById = await _userRepository.GetByIdAsync(id);
 
-            if (userById != null)
-            {
-                return new SuccessDataResult<AppUser?>(userById);
-            }
-            else
+            if (userById is null)
             {
                 return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
             }
-
+            return new SuccessDataResult<AppUser?>(Messages.UserNotFound);
         }
 
         public async Task<IDataResult<int>> CreateAsync(AppUser user)
@@ -66,10 +59,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             {
                 return new ErrorDataResult<int>(Messages.UserNotCreated);
             }
-            else
-            {
-                return new SuccessDataResult<int>(createdUser,Messages.Usercreated);
-            }
+            return new SuccessDataResult<int>(createdUser, Messages.Usercreated);
         }
 
         public async Task<Result> UpdateAsync(AppUser user)
@@ -79,10 +69,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             {
                 return new ErrorResult(Messages.UserNotUpdated);
             }
-            else
-            {
-                return new SuccessResult(Messages.UserUpdated);
-            }
+            return new SuccessResult(Messages.UserUpdated);
         }
 
         public async Task<Result> RemoveByIdAsync(int id)
@@ -92,10 +79,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             {
                 return new ErrorResult(Messages.UserNotDeleted);
             }
-            else
-            {
-                return new SuccessResult(Messages.UserDeleted);
-            }
+            return new SuccessResult(Messages.UserDeleted);
         }
     }
 }

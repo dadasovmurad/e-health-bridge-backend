@@ -31,7 +31,7 @@ namespace EHealthBridgeAPI.API.Controllers
 
         // Register a new user
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
             var existingUser = await _userService.GetByEmailOrName(request);
 
@@ -56,7 +56,7 @@ namespace EHealthBridgeAPI.API.Controllers
 
         //// Authenticate user (login)
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             var user = await _userManager.AuthenticateUserAsync(request.Username, request.Password);
 
@@ -65,7 +65,7 @@ namespace EHealthBridgeAPI.API.Controllers
 
             var token = _tokenHandler.CreateAccessToken(3600, user.Data);
 
-            return Ok(token);
+            return Ok(new DataResult<>);
         }
 
         //// Get user by ID
@@ -79,11 +79,11 @@ namespace EHealthBridgeAPI.API.Controllers
 
         // Update user details
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequestDto request)
         {
             var existingUser = await _userService.GetByIdAsync(id);
 
-            if (!existingUser.Success)
+            if (!existingUser.IsSuccess)
                 return NotFound(Messages.UserNotFound);
 
             var user = existingUser.Data;

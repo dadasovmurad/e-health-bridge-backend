@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace EHealthBridgeAPI.Application.DTOs
 {
-    public class Token
+    public class LoginDto
     {
-        public string AccessToken { get; set; }
-        public DateTime Expiration { get; set; }
+        public TokenDto Token { get; set; }
     }
 }

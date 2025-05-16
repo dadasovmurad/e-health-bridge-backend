@@ -36,7 +36,7 @@ namespace EHealthBridgeApi.UnitTest
             var result = await _userService.GetAllAsync();
 
             // Assert
-            Assert.True(result.Success);
+            Assert.True(result.IsSuccess);
             Assert.NotNull(result.Data);
             Assert.Equal(2, result.Data.Count());
         }
@@ -54,7 +54,7 @@ namespace EHealthBridgeApi.UnitTest
             var result = await _userService.GetByIdAsync(42);
 
             // Assert
-            Assert.True(result.Success);
+            Assert.True(result.IsSuccess);
             Assert.IsType<SuccessDataResult<AppUser?>>(result);
             Assert.Equal(testUser, result.Data);
         }
@@ -71,7 +71,7 @@ namespace EHealthBridgeApi.UnitTest
             var result = await _userService.GetByIdAsync(123);
 
             // Assert
-            Assert.False(result.Success);
+            Assert.False(result.IsSuccess);
             Assert.IsType<ErrorDataResult<AppUser?>>(result);
             Assert.Equal(Messages.UserNotFound, result.Message);
             Assert.Null(result.Data);
@@ -87,7 +87,7 @@ namespace EHealthBridgeApi.UnitTest
             var result = await _userService.CreateAsync(expectedUser);
 
             // Assert
-            Assert.True(result.Success);
+            Assert.True(result.IsSuccess);
             Assert.IsType<SuccessDataResult<int>>(result);
             Assert.Equal(Messages.Usercreated, result.Message);
         }
@@ -101,7 +101,7 @@ namespace EHealthBridgeApi.UnitTest
             var result = await _userService.CreateAsync(expectedUser);
 
             // Assert
-            Assert.False(result.Success);
+            Assert.False(result.IsSuccess);
             Assert.IsType<ErrorDataResult<int>>(result);
             Assert.Equal(Messages.UserNotCreated, result.Message);
         }
@@ -117,7 +117,7 @@ namespace EHealthBridgeApi.UnitTest
             var result = await _userService.UpdateAsync(expectedUser);
 
             // Assert
-            Assert.True(result.Success);
+            Assert.True(result.IsSuccess);
             Assert.IsType<SuccessResult>(result);
             Assert.Equal(Messages.UserUpdated, result.Message);
         }
@@ -133,7 +133,7 @@ namespace EHealthBridgeApi.UnitTest
 
             var result = await _userService.UpdateAsync(expectedUser);
 
-            Assert.False(result.Success);
+            Assert.False(result.IsSuccess);
             Assert.IsType<ErrorResult>(result);
             Assert.Equal(Messages.UserNotUpdated, result.Message);
         }
@@ -150,7 +150,7 @@ namespace EHealthBridgeApi.UnitTest
             // Act
             var result = await _userService.RemoveByIdAsync(42);
             // Assert
-            Assert.True(result.Success);
+            Assert.True(result.IsSuccess);
             Assert.IsType<SuccessResult>(result);
             Assert.Equal(Messages.UserDeleted, result.Message);
         }
@@ -159,7 +159,7 @@ namespace EHealthBridgeApi.UnitTest
         public async Task GetByEmailOrName_ReturnsError_WhenUsernameAndEmailAreEmpty()
         {
             // Arrange
-            var request = new RegisterRequest { Username = "", Email = "" };
+            var request = new RegisterRequestDto { Username = "", Email = "" };
 
             // Act
             var result = await _userService.GetByEmailOrName(request);
@@ -183,7 +183,7 @@ namespace EHealthBridgeApi.UnitTest
                 .Setup(repo => repo.GetAllAsync())
                 .ReturnsAsync(existingUsers);
 
-            var request = new RegisterRequest { Username = "existingUser", Email = "new@mail.com" };
+            var request = new RegisterRequestDto { Username = "existingUser", Email = "new@mail.com" };
 
             // Act
             var result = await _userService.GetByEmailOrName(request);
@@ -207,7 +207,7 @@ namespace EHealthBridgeApi.UnitTest
                 .Setup(repo => repo.GetAllAsync())
                 .ReturnsAsync(existingUsers);
 
-            var request = new RegisterRequest { Username = "newUser", Email = "existing@mail.com" };
+            var request = new RegisterRequestDto { Username = "newUser", Email = "existing@mail.com" };
 
             // Act
             var result = await _userService.GetByEmailOrName(request);
@@ -231,7 +231,7 @@ namespace EHealthBridgeApi.UnitTest
                 .Setup(repo => repo.GetAllAsync())
                 .ReturnsAsync(existingUsers);
 
-            var request = new RegisterRequest { Username = "uniqueUser", Email = "unique@mail.com" };
+            var request = new RegisterRequestDto { Username = "uniqueUser", Email = "unique@mail.com" };
 
             // Act
             var result = await _userService.GetByEmailOrName(request);

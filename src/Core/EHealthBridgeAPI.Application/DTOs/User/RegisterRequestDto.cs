@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EHealthBridgeAPI.Application.DTOs.User
+namespace EHealthBridgeAPI.Application.DTOs
 {
-    public class RegisterRequest
+    public class RegisterRequestDto
     {
         public string Username { get; set; }
         public string Email { get; set; }

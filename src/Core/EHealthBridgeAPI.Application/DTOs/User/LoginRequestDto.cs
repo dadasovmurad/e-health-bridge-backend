@@ -1,6 +1,6 @@
-﻿namespace EHealthBridgeAPI.Application.DTOs.User
+﻿namespace EHealthBridgeAPI.Application.DTOs
 {
-    public class LoginRequest
+    public class LoginRequestDto
     {
         public string Username { get; set; }
         public string Password { get; set; }

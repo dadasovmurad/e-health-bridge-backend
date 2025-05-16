@@ -1,5 +1,5 @@
 ﻿using Core.Results;
-using EHealthBridgeAPI.Application.DTOs.User;
+using EHealthBridgeAPI.Application.DTOs;
 using EHealthBridgeAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace EHealthBridgeAPI.Application.Abstractions.Services
         Task<IDataResult<IEnumerable<AppUser>>> GetAllAsync();
         Task<IDataResult<AppUser?>> GetByIdAsync(int id);
         Task<IDataResult<int>> CreateAsync(AppUser user);
-        Task<IDataResult<AppUser?>> GetByEmailOrName(RegisterRequest request);
+        Task<IDataResult<AppUser?>> GetByEmailOrUsername(string emailOrUsername);
         Task<Result> UpdateAsync(AppUser user);
         Task<Result> RemoveByIdAsync(int id);
     }
