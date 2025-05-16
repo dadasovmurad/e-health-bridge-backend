@@ -68,7 +68,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             }
             else
             {
-                return new SuccessDataResult<int>(Messages.Usercreated);
+                return new SuccessDataResult<int>(createdUser,Messages.Usercreated);
             }
         }
 

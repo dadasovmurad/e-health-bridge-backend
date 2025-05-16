@@ -80,11 +80,11 @@ namespace EHealthBridgeApi.UnitTest
         [Fact]
         public async Task CreateUser_ReturnSuccessResult_WhenCreated()
         {
-            var expectedUsers = new AppUser { Id = 1, Username = "user1", Email = "user1@mail.com" };
+            var expectedUser= new AppUser { Id = 1, Username = "user1", Email = "user1@mail.com" };
             //Arrange
-            _userRepositoryMock.Setup(repo => repo.InsertAsync(expectedUsers)).ReturnsAsync(1);
+            _userRepositoryMock.Setup(repo => repo.InsertAsync(expectedUser)).ReturnsAsync(1);
 
-            var result = await _userService.CreateAsync(expectedUsers);
+            var result = await _userService.CreateAsync(expectedUser);
 
             // Assert
             Assert.True(result.Success);
@@ -95,10 +95,10 @@ namespace EHealthBridgeApi.UnitTest
         [Fact]
         public async Task CreatedUser_ReturnError_WhenCanNotCreated()
         {
-            var expectedUsers = new AppUser { Username = "failuser", Email = "fail@example.com" };
-            _userRepositoryMock.Setup(repo => repo.InsertAsync(expectedUsers)).ReturnsAsync(0);
+            var expectedUser = new AppUser { Username = "failuser", Email = "fail@example.com" };
+            _userRepositoryMock.Setup(repo => repo.InsertAsync(expectedUser)).ReturnsAsync(0);
 
-            var result = await _userService.CreateAsync(expectedUsers);
+            var result = await _userService.CreateAsync(expectedUser);
 
             // Assert
             Assert.False(result.Success);
@@ -109,12 +109,12 @@ namespace EHealthBridgeApi.UnitTest
         [Fact]
         public async Task UpdateUser_ReturnSuccess_WhenUpdate()
         {
-            var expectedUsers = new AppUser { Id = 1, Username = "user1", Email = "user1@mail.com" };
+            var expectedUser = new AppUser { Id = 1, Username = "user1", Email = "user1@mail.com" };
 
             //Arrange
-            _userRepositoryMock.Setup(repo => repo.UpdateAsync(expectedUsers)).ReturnsAsync(true);
+            _userRepositoryMock.Setup(repo => repo.UpdateAsync(expectedUser)).ReturnsAsync(true);
 
-            var result = await _userService.UpdateAsync(expectedUsers);
+            var result = await _userService.UpdateAsync(expectedUser);
 
             // Assert
             Assert.True(result.Success);
