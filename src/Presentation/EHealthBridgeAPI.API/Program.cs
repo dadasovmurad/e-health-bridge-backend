@@ -57,7 +57,7 @@ namespace EHealthBridgeAPI.API
 
             //global exception middleware
             app.UseGlobalExceptionMiddleware();
-
+            //builder.Services.AddAutoMapper(typeof(EHealthBridgeAPI.Application.Mappings.MappingProfile).Assembly);
             app.UseAuthentication();
             app.UseAuthorization();
 
