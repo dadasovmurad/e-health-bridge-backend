@@ -10,6 +10,7 @@ using EHealthBridgeAPI.Application.DTOs;
 using EHealthBridgeAPI.Domain.Entities;
 using EHealthBridgeAPI.Application.Exceptions;
 using EHealthBridgeAPI.Application.Abstractions.Token;
+using EHealthBridgeAPI.Application.DTOs.Auth;
 
 
 namespace EHealthBridgeAPI.Persistence.Services
@@ -24,23 +25,23 @@ namespace EHealthBridgeAPI.Persistence.Services
             _tokenHandler = tokenHandler;
         }
 
-        public async Task<IDataResult<LoginDto>> LoginAsync(string usernameOrEmail, string password, int accessTokenLifeTime)
+        public async Task<IDataResult<LoginDto>> LoginAsync(InternalLoginRequestDto internalLoginRequestDto)
         {
-            var requestUser = await _userService.GetByEmailOrUsername(usernameOrEmail);
+            var requestUser = await _userService.GetByEmailAsync(internalLoginRequestDto.UsernameOrEmail);
             if (!requestUser.IsSuccess)
             {
                 return new ErrorDataResult<LoginDto>(Messages.LoginFailure);
             }
             var user = requestUser.Data;
 
-            if (BCrypt.Net.BCrypt.Verify(password, user!.PasswordHash)) // user is not null (validated earlier in UserService)
+            if (BCrypt.Net.BCrypt.Verify(internalLoginRequestDto.Password, user!.PasswordHash)) // user is not null (validated earlier in UserService)
             {
                 return new ErrorDataResult<LoginDto>(Messages.LoginFailure);
             }
 
-            var token = _tokenHandler.CreateAccessToken(3600, user);
+            var token = _tokenHandler.CreateAccessToken(3600, new AppUser(user.Username, user.Email, user.PasswordHash, user.FirstName, user.LastName));
 
-            return new SuccessDataResult<LoginDto>(new LoginDto { Token = token }, Messages.LoginSuccess);
+            return new SuccessDataResult<LoginDto>(new LoginDto(token), Messages.LoginSuccess);
         }
     }
 }

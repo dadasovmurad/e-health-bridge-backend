@@ -6,8 +6,5 @@ using System.Threading.Tasks;
 
 namespace EHealthBridgeAPI.Application.DTOs
 {
-    public class LoginDto
-    {
-        public TokenDto Token { get; set; }
-    }
+    public record LoginDto(TokenDto token);
 }

@@ -22,20 +22,20 @@ namespace EHealthBridgeAPI.Persistence.Repositories
         {
             _context = context;
         }
-        public async Task<AppUser?> GetByEmailOrUsernameAsync(string emailOrUsername)
+        public async Task<AppUser> GetByEmailAsync(string email)
         {
             var sql = @"
             SELECT * FROM app_users 
-            WHERE email = @EmailOrUsername OR username = @EmailOrUsername";
+            WHERE email = @Email";
 
             // Get the Npgsql connection from EF Core
             using var connection = _context.CreateConnection();
 
             var user = await connection.QueryFirstOrDefaultAsync<AppUser>(
                 sql,
-                new { EmailOrUsername = emailOrUsername }
+                new { Email = email }
             );
-
+            
             return SnakeCaseMapper.MapTo<AppUser>(user);
         }
     }

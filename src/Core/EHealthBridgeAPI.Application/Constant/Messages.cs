@@ -19,11 +19,11 @@ namespace EHealthBridgeAPI.Application.Constant
         public static string UserNotCreated = "İstifadəçi qeydiyyata alınmadı";
         public static string Usercreated = "İstifadəçi qeydə alındı";
 
-        public static string UserUpdated= "İstifadəçi dəyişdirildi";
+        public static string UserSuccessfullyUpdated = "İstifadəçi dəyişdirildi";
         public static string UserNotUpdated = "İstifadəçi dəyişdirilmədi";
 
         public static string UserDeleted = "İstifadəçi silindi";
         public static string UserNotDeleted = "İstifadəçi silinmədi!";
-
+        public static string UserAlreadyExists = "User already exists !";
     }
 }

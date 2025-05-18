@@ -9,6 +9,6 @@ namespace EHealthBridgeAPI.Application.Repositories
 {
     public interface IUserRepository : IGenericRepository<AppUser>
     {
-        Task<AppUser?> GetByEmailOrUsernameAsync(string emailOrUsername);
+        Task<AppUser> GetByEmailAsync(string emailOrUsername);
     }
 }

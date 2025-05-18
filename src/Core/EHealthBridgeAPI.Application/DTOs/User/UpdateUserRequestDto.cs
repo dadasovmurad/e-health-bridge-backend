@@ -1,10 +1,4 @@
 ﻿namespace EHealthBridgeAPI.Application.DTOs
 {
-    public class UpdateUserRequestDto
-    {
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
+    public record UpdateUserRequestDto(string FirstName, string LastName,string Username, string Email);
 }

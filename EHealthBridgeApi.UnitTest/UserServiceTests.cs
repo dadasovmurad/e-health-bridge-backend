@@ -119,7 +119,7 @@ namespace EHealthBridgeApi.UnitTest
             // Assert
             Assert.True(result.IsSuccess);
             Assert.IsType<SuccessResult>(result);
-            Assert.Equal(Messages.UserUpdated, result.Message);
+            Assert.Equal(Messages.UserSuccessfullyUpdated, result.Message);
         }
 
         [Fact]

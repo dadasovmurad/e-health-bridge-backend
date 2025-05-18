@@ -6,12 +6,5 @@ using System.Threading.Tasks;
 
 namespace EHealthBridgeAPI.Application.DTOs
 {
-    public class RegisterRequestDto
-    {
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
+    public record RegisterRequestDto(string FirstName, string LastName, string Email, string UserName, string Password);
 }

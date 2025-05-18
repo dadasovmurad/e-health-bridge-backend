@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
+using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Domain.Entities.Common;
 
 public static class SnakeCaseMapper

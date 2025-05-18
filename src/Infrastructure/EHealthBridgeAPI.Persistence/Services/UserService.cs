@@ -24,37 +24,60 @@ namespace EHealthBridgeAPI.Persistence.Services
             _userRepository = userRepository;
         }
 
-        public async Task<IDataResult<IEnumerable<AppUser>>> GetAllAsync()
+        public async Task<IDataResult<IEnumerable<AppUserDto>>> GetAllAsync()
         {
             var users = await _userRepository.GetAllAsync();
+            List<AppUserDto> result = new List<AppUserDto>();
+            foreach (var item in users)
+            {
+                result.Add(new(item.FirstName, item.LastName, item.Email, item.Username, item.PasswordHash));
+            }
 
-            return new SuccessDataResult<IEnumerable<AppUser>>(users);
+            return new SuccessDataResult<IEnumerable<AppUserDto>>(result);
         }
 
-        public async Task<IDataResult<AppUser?>> GetByEmailOrUsername(string emailOrUsername)
+        public async Task<IDataResult<AppUserDto>> GetByEmailAsync(string emailOrUsername)
         {
-            var requestUser = await _userRepository.GetByEmailOrUsernameAsync(emailOrUsername);
+            var requestUser = await _userRepository.GetByEmailAsync(emailOrUsername);
             if (requestUser is null)
             {
-                return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
+                return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
             }
-            return new SuccessDataResult<AppUser?>(requestUser);
+
+            var appUserDto = new AppUserDto(requestUser.FirstName, requestUser.LastName, requestUser.Email, requestUser.Username, requestUser.PasswordHash);
+
+            return new SuccessDataResult<AppUserDto>(appUserDto);
         }
 
-        public async Task<IDataResult<AppUser?>> GetByIdAsync(int id)
+        public async Task<IDataResult<AppUserDto>> GetByIdAsync(int id)
         {
             var userById = await _userRepository.GetByIdAsync(id);
-
             if (userById is null)
             {
-                return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
+                return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
             }
-            return new SuccessDataResult<AppUser?>(Messages.UserNotFound);
+
+            return new SuccessDataResult<AppUserDto>(Messages.UserNotFound);
         }
 
-        public async Task<IDataResult<int>> CreateAsync(AppUser user)
+        public async Task<IDataResult<int>> CreateAsync(RegisterRequestDto registerRequestDto)
         {
-            var createdUser = await _userRepository.InsertAsync(user);
+            var userByEmailOrUsername = _userRepository.GetByEmailAsync(registerRequestDto.Email);
+            if (userByEmailOrUsername is not null)
+            {
+                return new ErrorDataResult<int>(Messages.UserAlreadyExists);
+            }
+
+            var newUser = new AppUser
+            {
+                Username = registerRequestDto.UserName,
+                Email = registerRequestDto.Email,
+                FirstName = registerRequestDto.FirstName,
+                LastName = registerRequestDto.LastName,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequestDto.Password)
+            };
+
+            var createdUser = await _userRepository.InsertAsync(newUser);
             if (createdUser == 0)
             {
                 return new ErrorDataResult<int>(Messages.UserNotCreated);
@@ -62,14 +85,28 @@ namespace EHealthBridgeAPI.Persistence.Services
             return new SuccessDataResult<int>(createdUser, Messages.Usercreated);
         }
 
-        public async Task<Result> UpdateAsync(AppUser user)
+        public async Task<Result> UpdateAsync(int id, UpdateUserRequestDto updateUserRequestDto)
         {
-            var updatedStatus = await _userRepository.UpdateAsync(user);
-            if (!updatedStatus)
+            var userById = await _userRepository.GetByIdAsync(id);
+            if (userById is not null)
             {
+                var user = new AppUser
+                {
+                    Id = id,
+                    Email = userById.Email,
+                    FirstName = userById.FirstName,
+                    LastName = userById.LastName,
+                    Username = userById.Username,
+                };
+
+                var updatedStatus = await _userRepository.UpdateAsync(user);
+                if (updatedStatus)
+                {
+                    return new SuccessResult(Messages.UserSuccessfullyUpdated);
+                }
                 return new ErrorResult(Messages.UserNotUpdated);
             }
-            return new SuccessResult(Messages.UserUpdated);
+            return new ErrorResult(Messages.UserNotFound);
         }
 
         public async Task<Result> RemoveByIdAsync(int id)
