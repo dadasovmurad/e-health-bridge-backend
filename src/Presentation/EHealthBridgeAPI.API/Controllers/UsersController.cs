@@ -13,7 +13,7 @@ namespace EHealthBridgeAPI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : BaseApiController
     {
         private readonly IUserService _userService;
         private readonly ITokenHandler _tokenHandler;
@@ -29,38 +29,29 @@ namespace EHealthBridgeAPI.API.Controllers
             return Ok("Api is working");
         }
 
-        // Register a new user
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
-            var userId = await _userService.CreateAsync(request);
-
-            return Ok(userId);
+            return GetResponseResult(await _userService.CreateAsync(request));
         }
 
-        //// Get user by ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _userService.GetByIdAsync(id);
-
-            return Ok(user);
+            return GetResponseResult(await _userService.GetByIdAsync(id));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var deleted = await _userService.RemoveByIdAsync(id);
-
-            return Ok(deleted);
+            return GetResponseResult(await _userService.RemoveByIdAsync(id));
         }
 
         [Authorize(AuthenticationSchemes = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _userService.GetAllAsync();
-            return Ok(users);
+            return GetResponseResult(await _userService.GetAllAsync());
         }
     }
 }

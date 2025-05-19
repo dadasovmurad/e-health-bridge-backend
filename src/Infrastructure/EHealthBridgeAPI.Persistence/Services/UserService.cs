@@ -85,7 +85,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             return new SuccessDataResult<int>(createdUser, Messages.Usercreated);
         }
 
-        public async Task<Result> UpdateAsync(int id, UpdateUserRequestDto updateUserRequestDto)
+        public async Task<IResult> UpdateAsync(int id, UpdateUserRequestDto updateUserRequestDto)
         {
             var userById = await _userRepository.GetByIdAsync(id);
             if (userById is not null)
@@ -109,7 +109,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             return new ErrorResult(Messages.UserNotFound);
         }
 
-        public async Task<Result> RemoveByIdAsync(int id)
+        public async Task<IResult> RemoveByIdAsync(int id)
         {
             var deletedStatus = await _userRepository.DeleteAsync(id);
             if (!deletedStatus)
