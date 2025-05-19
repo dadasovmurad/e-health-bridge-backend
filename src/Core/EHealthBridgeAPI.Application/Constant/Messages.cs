@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EHealthBridgeAPI.Application.Constant
+﻿namespace EHealthBridgeAPI.Application.Constant
 {
     public static class Messages
     {
-        public static string UserNotFound = "İstifadəçi tapilmadi";
-        public static string LoginSuccess = "Login oldunuz";
-        public static string LoginFailure = "Username or password incorrect";
+        public const string UserNotFound = "User not found";
+        public const string LoginSuccess = "Successfully logged in";
+        public const string LoginFailure = "Incorrect username or password";
 
-        public static string InvalidRequest = "Invalid request";
+        public const string InvalidRequest = "Invalid request";
 
+        public const string UserNotCreated = "User registration failed";
+        public const string Usercreated = "User registered successfully";
 
-        public static string UserNotCreated = "İstifadəçi qeydiyyata alınmadı";
-        public static string Usercreated = "İstifadəçi qeydə alındı";
+        public const string UserSuccessfullyUpdated = "User updated successfully";
+        public const string UserNotUpdated = "User update failed";
 
-        public static string UserSuccessfullyUpdated = "İstifadəçi dəyişdirildi";
-        public static string UserNotUpdated = "İstifadəçi dəyişdirilmədi";
+        public const string UserDeleted = "User deleted successfully";
+        public const string UserNotDeleted = "User could not be deleted";
 
-        public static string UserDeleted = "İstifadəçi silindi";
-        public static string UserNotDeleted = "İstifadəçi silinmədi!";
-        public static string UserAlreadyExists = "User already exists !";
+        public const string UserAlreadyExists = "User already exists";
     }
 }

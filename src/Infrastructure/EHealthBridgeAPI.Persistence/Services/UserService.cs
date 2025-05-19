@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Core.Results;
-using EHealthBridgeAPI.Application.Abstractions.Services;
+﻿using EHealthBridgeAPI.Application.Abstractions.Services;
+using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.DTOs;
-using EHealthBridgeAPI.Application.DTOs.User;
-using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
+using Core.Results;
+using AutoMapper;
 
 namespace EHealthBridgeAPI.Persistence.Services
 {
