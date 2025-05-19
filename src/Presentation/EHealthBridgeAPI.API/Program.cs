@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.OpenApi.Models;
 using EHealthBridgeAPI.API.Extensions;
+using EHealthBridgeAPI.Application.Features.Profiles;
 
 namespace EHealthBridgeAPI.API
 {
@@ -23,6 +23,7 @@ namespace EHealthBridgeAPI.API
             services.AddPersistenceServices();
             services.AddInfrastructureServices();
             builder.Services.AddSwaggerWithJwt();
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer("Admin", options =>
@@ -58,6 +59,7 @@ namespace EHealthBridgeAPI.API
             //global exception middleware
             app.UseGlobalExceptionMiddleware();
 
+           
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.Results;
-using EHealthBridgeAPI.Application.Abstractions.Services;
+﻿using EHealthBridgeAPI.Application.Abstractions.Services;
+using EHealthBridgeAPI.Application.Abstractions.Token;
+using EHealthBridgeAPI.Application.DTOs.Auth;
 using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.DTOs;
 using EHealthBridgeAPI.Domain.Entities;
-using EHealthBridgeAPI.Application.Exceptions;
-using EHealthBridgeAPI.Application.Abstractions.Token;
-using EHealthBridgeAPI.Application.DTOs.Auth;
+using Core.Results;
+using AutoMapper;
 
 
 namespace EHealthBridgeAPI.Persistence.Services
@@ -19,10 +14,12 @@ namespace EHealthBridgeAPI.Persistence.Services
     {
         private readonly IUserService _userService;
         private readonly ITokenHandler _tokenHandler;
-        public AuthService(IUserService userService, ITokenHandler tokenHandler)
+        private readonly IMapper _mapper;
+        public AuthService(IUserService userService, ITokenHandler tokenHandler,IMapper mapper)
         {
             _userService = userService;
             _tokenHandler = tokenHandler;
+            _mapper = mapper;
         }
 
         public async Task<IDataResult<LoginDto>> LoginAsync(InternalLoginRequestDto internalLoginRequestDto)
@@ -38,8 +35,8 @@ namespace EHealthBridgeAPI.Persistence.Services
             {
                 return new ErrorDataResult<LoginDto>(Messages.LoginFailure);
             }
-
-            var token = _tokenHandler.CreateAccessToken(3600, new AppUser(user.Username, user.Email, user.PasswordHash, user.FirstName, user.LastName));
+            var newuser = _mapper.Map<AppUser>(user);
+            var token = _tokenHandler.CreateAccessToken(3600, newuser);
 
             return new SuccessDataResult<LoginDto>(new LoginDto(token), Messages.LoginSuccess);
         }

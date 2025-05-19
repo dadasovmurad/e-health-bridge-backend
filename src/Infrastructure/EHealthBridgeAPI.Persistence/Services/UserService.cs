@@ -1,36 +1,32 @@
-﻿using Core.Results;
-using EHealthBridgeAPI.Application.Abstractions.Services;
+﻿using EHealthBridgeAPI.Application.Abstractions.Services;
+using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.DTOs;
-using EHealthBridgeAPI.Application.DTOs.User;
-using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Core.Results;
+using AutoMapper;
 
 namespace EHealthBridgeAPI.Persistence.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-
-        public UserService(IUserRepository userRepository)
+        private readonly IMapper _mapper;
+        public UserService(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         public async Task<IDataResult<IEnumerable<AppUserDto>>> GetAllAsync()
         {
             var users = await _userRepository.GetAllAsync();
-            List<AppUserDto> result = new List<AppUserDto>();
-            foreach (var item in users)
+            var result = _mapper.Map<IEnumerable<AppUserDto>>(users);
+
+            if (users == null || !users.Any())
             {
-                result.Add(new(item.FirstName, item.LastName, item.Email, item.Username, item.PasswordHash));
+                return new ErrorDataResult<IEnumerable<AppUserDto>>(Messages.UserNotFound);
             }
 
             return new SuccessDataResult<IEnumerable<AppUserDto>>(result);
@@ -38,14 +34,18 @@ namespace EHealthBridgeAPI.Persistence.Services
 
         public async Task<IDataResult<AppUserDto>> GetByUsernameAsync(string username)
         {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return new ErrorDataResult<AppUserDto>(Messages.InvalidRequest);
+            }
+
             var requestUser = await _userRepository.GetByUsernameAsync(username);
             if (requestUser is null)
             {
                 return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
             }
 
-            var appUserDto = new AppUserDto(requestUser.FirstName, requestUser.LastName, requestUser.Email, requestUser.Username, requestUser.PasswordHash);
-
+            var appUserDto = _mapper.Map<AppUserDto>(requestUser);
             return new SuccessDataResult<AppUserDto>(appUserDto);
         }
 
@@ -56,8 +56,9 @@ namespace EHealthBridgeAPI.Persistence.Services
             {
                 return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
             }
+            var appUserDto = _mapper.Map<AppUserDto>(userById);
 
-            return new SuccessDataResult<AppUserDto>(new AppUserDto(userById.Username,userById.LastName,userById.Email,userById.Username,userById.PasswordHash));
+            return new SuccessDataResult<AppUserDto>(appUserDto);
         }
 
         public async Task<IDataResult<int>> CreateAsync(RegisterRequestDto registerRequestDto)
@@ -68,16 +69,10 @@ namespace EHealthBridgeAPI.Persistence.Services
                 return new ErrorDataResult<int>(Messages.UserAlreadyExists);
             }
 
-            var newUser = new AppUser
-            {
-                Username = registerRequestDto.UserName,
-                Email = registerRequestDto.Email,
-                FirstName = registerRequestDto.FirstName,
-                LastName = registerRequestDto.LastName,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequestDto.Password)
-            };
+            var newuser= _mapper.Map<AppUser>(registerRequestDto);
+            newuser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequestDto.Password);
+            var createdUser = await _userRepository.InsertAsync(newuser);
 
-            var createdUser = await _userRepository.InsertAsync(newUser);
             if (createdUser == 0)
             {
                 return new ErrorDataResult<int>(Messages.UserNotCreated);
@@ -90,16 +85,9 @@ namespace EHealthBridgeAPI.Persistence.Services
             var userById = await _userRepository.GetByIdAsync(id);
             if (userById is not null)
             {
-                var user = new AppUser
-                {
-                    Id = id,
-                    Email = userById.Email,
-                    FirstName = userById.FirstName,
-                    LastName = userById.LastName,
-                    Username = userById.Username,
-                };
-
-                var updatedStatus = await _userRepository.UpdateAsync(user);
+                var User = _mapper.Map<AppUser>(updateUserRequestDto);
+                User.Id = id;
+                var updatedStatus = await _userRepository.UpdateAsync(User);
                 if (updatedStatus)
                 {
                     return new SuccessResult(Messages.UserSuccessfullyUpdated);
