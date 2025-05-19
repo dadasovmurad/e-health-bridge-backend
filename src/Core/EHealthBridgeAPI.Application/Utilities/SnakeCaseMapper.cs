@@ -7,6 +7,7 @@ public static class SnakeCaseMapper
 {
     public static List<T> MapTo<T>(IEnumerable<dynamic> rows) where T : BaseEntity, new()
     {
+        if (rows is null) return null;
         var props = typeof(T).GetProperties();
         var result = new List<T>();
 
@@ -33,6 +34,8 @@ public static class SnakeCaseMapper
     }
     public static T MapTo<T>(dynamic row) where T : BaseEntity, new()
     {
+        if (row is null) return null;
+
         var props = typeof(T).GetProperties();
         var result = new List<T>();
         var entity = new T();

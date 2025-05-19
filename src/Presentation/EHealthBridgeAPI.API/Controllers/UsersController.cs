@@ -22,6 +22,7 @@ namespace EHealthBridgeAPI.API.Controllers
             _userService = userService;
             _tokenHandler = tokenHandler;
         }
+
         [HttpGet("test")]
         public IActionResult Test()
         {
@@ -37,8 +38,6 @@ namespace EHealthBridgeAPI.API.Controllers
             return Ok(userId);
         }
 
-        //// Authenticate user (login)
-
         //// Get user by ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
@@ -48,15 +47,6 @@ namespace EHealthBridgeAPI.API.Controllers
             return Ok(user);
         }
 
-        // Update user details
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequestDto request)
-        {
-            var updated = await _userService.UpdateAsync(id, request);
-            return Ok(updated);
-        }
-
-        // Delete user
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -64,6 +54,7 @@ namespace EHealthBridgeAPI.API.Controllers
 
             return Ok(deleted);
         }
+
         [Authorize(AuthenticationSchemes = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()

@@ -18,8 +18,9 @@ namespace EHealthBridgeAPI.Persistence
         public static void AddPersistenceServices(this IServiceCollection services)
         {
             services.AddSingleton<EHealthBridgeAPIDbContext>();
-            services.AddScoped<IUserManager,UserManager>();
             services.AddScoped<IUserService,UserService>();
+            services.AddScoped<IAuthService,AuthService>();
+            services.AddScoped<IUserRepository,UserRepository>();
             //services.AddScoped<IGenericRepository, GenericRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 

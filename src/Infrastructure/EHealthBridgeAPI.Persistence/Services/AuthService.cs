@@ -27,14 +27,14 @@ namespace EHealthBridgeAPI.Persistence.Services
 
         public async Task<IDataResult<LoginDto>> LoginAsync(InternalLoginRequestDto internalLoginRequestDto)
         {
-            var requestUser = await _userService.GetByEmailAsync(internalLoginRequestDto.UsernameOrEmail);
+            var requestUser = await _userService.GetByUsernameAsync(internalLoginRequestDto.Username);
             if (!requestUser.IsSuccess)
             {
                 return new ErrorDataResult<LoginDto>(Messages.LoginFailure);
             }
             var user = requestUser.Data;
 
-            if (BCrypt.Net.BCrypt.Verify(internalLoginRequestDto.Password, user!.PasswordHash)) // user is not null (validated earlier in UserService)
+            if (!BCrypt.Net.BCrypt.Verify(internalLoginRequestDto.Password, user!.PasswordHash)) // user is not null (validated earlier in UserService)
             {
                 return new ErrorDataResult<LoginDto>(Messages.LoginFailure);
             }

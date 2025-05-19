@@ -36,9 +36,9 @@ namespace EHealthBridgeAPI.Persistence.Services
             return new SuccessDataResult<IEnumerable<AppUserDto>>(result);
         }
 
-        public async Task<IDataResult<AppUserDto>> GetByEmailAsync(string emailOrUsername)
+        public async Task<IDataResult<AppUserDto>> GetByUsernameAsync(string username)
         {
-            var requestUser = await _userRepository.GetByEmailAsync(emailOrUsername);
+            var requestUser = await _userRepository.GetByUsernameAsync(username);
             if (requestUser is null)
             {
                 return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
@@ -57,13 +57,13 @@ namespace EHealthBridgeAPI.Persistence.Services
                 return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
             }
 
-            return new SuccessDataResult<AppUserDto>(Messages.UserNotFound);
+            return new SuccessDataResult<AppUserDto>(new AppUserDto(userById.Username,userById.LastName,userById.Email,userById.Username,userById.PasswordHash));
         }
 
         public async Task<IDataResult<int>> CreateAsync(RegisterRequestDto registerRequestDto)
         {
-            var userByEmailOrUsername = _userRepository.GetByEmailAsync(registerRequestDto.Email);
-            if (userByEmailOrUsername is not null)
+            var requestUser = await _userRepository.GetByUsernameAsync(registerRequestDto.UserName);
+            if (requestUser is not null)
             {
                 return new ErrorDataResult<int>(Messages.UserAlreadyExists);
             }
