@@ -55,7 +55,7 @@ namespace EHealthBridgeAPI.API.Controllers
             return Ok(deleted);
         }
 
-        [Authorize(AuthenticationSchemes = "Admin")]
+        //[Authorize(AuthenticationSchemes = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
