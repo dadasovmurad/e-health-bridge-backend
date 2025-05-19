@@ -13,9 +13,9 @@ namespace Core.Results
 
         public Result(bool success)
         {
-            Success = success;
+            IsSuccess = success;
         }
-        public bool Success { get; }
+        public bool IsSuccess { get; }
         public string Message { get; }
     }
 }

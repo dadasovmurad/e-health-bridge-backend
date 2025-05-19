@@ -1,6 +1,7 @@
 ﻿using Core.Results;
 using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Constant;
+using EHealthBridgeAPI.Application.DTOs;
 using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Domain.Entities;
@@ -16,73 +17,96 @@ namespace EHealthBridgeAPI.Persistence.Services
 {
     public class UserService : IUserService
     {
-        private readonly IGenericRepository<AppUser> _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(IGenericRepository<AppUser> userRepository)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
-        public async Task<IDataResult<IEnumerable<AppUser>>> GetAllAsync()
+        public async Task<IDataResult<IEnumerable<AppUserDto>>> GetAllAsync()
         {
             var users = await _userRepository.GetAllAsync();
-            return new SuccessDataResult<IEnumerable<AppUser>>(users);
+            List<AppUserDto> result = new List<AppUserDto>();
+            foreach (var item in users)
+            {
+                result.Add(new(item.FirstName, item.LastName, item.Email, item.Username, item.PasswordHash));
+            }
+
+            return new SuccessDataResult<IEnumerable<AppUserDto>>(result);
         }
 
-        public async Task<IDataResult<AppUser?>> GetByEmailOrName(RegisterRequest request)
+        public async Task<IDataResult<AppUserDto>> GetByUsernameAsync(string username)
         {
-            if (string.IsNullOrEmpty(request.Username) && string.IsNullOrEmpty(request.Email))
-                return new ErrorDataResult<AppUser?>(Messages.InvalidRequest);
+            var requestUser = await _userRepository.GetByUsernameAsync(username);
+            if (requestUser is null)
+            {
+                return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
+            }
 
-            var existingUser = await GetAllAsync();
+            var appUserDto = new AppUserDto(requestUser.FirstName, requestUser.LastName, requestUser.Email, requestUser.Username, requestUser.PasswordHash);
 
-            var user = existingUser.Data;
-            if (user.Any(u => u.Username == request.Username))
-                return new ErrorDataResult<AppUser?>(Messages.UserNotCreated);
-            if (user.Any(u => u.Email == request.Email))
-                return new ErrorDataResult<AppUser?>(Messages.UserNotCreated);
-            return new SuccessDataResult<AppUser?>();
+            return new SuccessDataResult<AppUserDto>(appUserDto);
         }
 
-        public async Task<IDataResult<AppUser?>> GetByIdAsync(int id)
+        public async Task<IDataResult<AppUserDto>> GetByIdAsync(int id)
         {
             var userById = await _userRepository.GetByIdAsync(id);
-
-            if (userById != null)
+            if (userById is null)
             {
-                return new SuccessDataResult<AppUser?>(userById);
-            }
-            else
-            {
-                return new ErrorDataResult<AppUser?>(Messages.UserNotFound);
+                return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
             }
 
+            return new SuccessDataResult<AppUserDto>(new AppUserDto(userById.Username,userById.LastName,userById.Email,userById.Username,userById.PasswordHash));
         }
 
-        public async Task<IDataResult<int>> CreateAsync(AppUser user)
+        public async Task<IDataResult<int>> CreateAsync(RegisterRequestDto registerRequestDto)
         {
-            var createdUser = await _userRepository.InsertAsync(user);
+            var requestUser = await _userRepository.GetByUsernameAsync(registerRequestDto.UserName);
+            if (requestUser is not null)
+            {
+                return new ErrorDataResult<int>(Messages.UserAlreadyExists);
+            }
+
+            var newUser = new AppUser
+            {
+                Username = registerRequestDto.UserName,
+                Email = registerRequestDto.Email,
+                FirstName = registerRequestDto.FirstName,
+                LastName = registerRequestDto.LastName,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequestDto.Password)
+            };
+
+            var createdUser = await _userRepository.InsertAsync(newUser);
             if (createdUser == 0)
             {
                 return new ErrorDataResult<int>(Messages.UserNotCreated);
             }
-            else
-            {
-                return new SuccessDataResult<int>(createdUser,Messages.Usercreated);
-            }
+            return new SuccessDataResult<int>(createdUser, Messages.Usercreated);
         }
 
-        public async Task<Result> UpdateAsync(AppUser user)
+        public async Task<Result> UpdateAsync(int id, UpdateUserRequestDto updateUserRequestDto)
         {
-            var updatedStatus = await _userRepository.UpdateAsync(user);
-            if (!updatedStatus)
+            var userById = await _userRepository.GetByIdAsync(id);
+            if (userById is not null)
             {
+                var user = new AppUser
+                {
+                    Id = id,
+                    Email = userById.Email,
+                    FirstName = userById.FirstName,
+                    LastName = userById.LastName,
+                    Username = userById.Username,
+                };
+
+                var updatedStatus = await _userRepository.UpdateAsync(user);
+                if (updatedStatus)
+                {
+                    return new SuccessResult(Messages.UserSuccessfullyUpdated);
+                }
                 return new ErrorResult(Messages.UserNotUpdated);
             }
-            else
-            {
-                return new SuccessResult(Messages.UserUpdated);
-            }
+            return new ErrorResult(Messages.UserNotFound);
         }
 
         public async Task<Result> RemoveByIdAsync(int id)
@@ -92,10 +116,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             {
                 return new ErrorResult(Messages.UserNotDeleted);
             }
-            else
-            {
-                return new SuccessResult(Messages.UserDeleted);
-            }
+            return new SuccessResult(Messages.UserDeleted);
         }
     }
 }

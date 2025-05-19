@@ -1,4 +1,6 @@
-﻿using System;
+
+﻿using EHealthBridgeAPI.Domain.Entities.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -7,13 +9,5 @@ using System.Threading.Tasks;
 
 namespace EHealthBridgeAPI.Application.DTOs.User
 {
-    public class AppUserDto
-    {
-        public string? Username { get; set; }
-        public string? Email { get; set; }
-        public string? PasswordHash { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public bool IsActive { get; set; } = true;
-    }
+    public record AppUserDto(string FirstName, string LastName, string Email, string Username, string PasswordHash, bool IsActive = true);
 }

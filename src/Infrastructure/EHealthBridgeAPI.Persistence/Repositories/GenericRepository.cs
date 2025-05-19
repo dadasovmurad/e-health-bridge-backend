@@ -42,8 +42,8 @@ namespace EHealthBridgeAPI.Persistence.Repositories
         {
             var param = DapperParamBuilder.BuildParameters(entity);
 
-            var columns = string.Join(", ", _columnNames); // "email", "created_at"
-            var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"'))); // @email, @created_at
+            var columns = string.Join(", ", _columnNames);
+            var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"')));
 
             var sql = $@"
                 INSERT INTO {_tableName} ({columns})
