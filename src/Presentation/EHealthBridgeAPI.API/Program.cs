@@ -48,6 +48,8 @@ namespace EHealthBridgeAPI.API
             builder.Services.AddSwaggerGen();
             var app = builder.Build();
 
+            //global exception middleware
+            app.UseGlobalExceptionMiddleware();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -56,8 +58,6 @@ namespace EHealthBridgeAPI.API
 
             // app.UseHttpsRedirection(); // optional, for HTTP to HTTPS
 
-            //global exception middleware
-            app.UseGlobalExceptionMiddleware();
 
            
             app.UseAuthentication();
