@@ -49,6 +49,66 @@ namespace EHealthBridgeAPI.Persistence.Services
             return new SuccessDataResult<AppUserDto>(appUserDto);
         }
 
+        public async Task<IDataResult<AppUserDto>> GetByEmailAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return new ErrorDataResult<AppUserDto>(Messages.EmailCannotEmpty);
+            }
+
+            var user = await _userRepository.GetByEmailAsync(email); // repository-də olmalıdır
+            if (user == null)
+            {
+                return new ErrorDataResult<AppUserDto>(Messages.EmailNotFound);
+            }
+
+            var appUserDto = _mapper.Map<AppUserDto>(user);
+            return new SuccessDataResult<AppUserDto>(appUserDto);
+        }
+
+        public async Task<IResult> GeneratePasswordResetTokenAsync(string email)
+        {
+            var userResult = await GetByEmailAsync(email);
+            if (!userResult.IsSuccess)
+                return new ErrorResult(userResult.Message);
+
+            var user = await _userRepository.GetByEmailAsync(email);
+
+            var token = Guid.NewGuid().ToString(); // Sadə token, JWT də istifadə oluna bilər
+            var expiry = DateTime.UtcNow.AddMinutes(30);
+
+            user.PasswordResetToken = token;
+            user.PasswordResetTokenExpiry = expiry;
+
+            await _userRepository.UpdateAsync(user);
+
+            // Əgər mail göndərmək olsaydı, burada göndəriləcəkdi
+
+            return new SuccessResult(Messages.PasswordResetTokenCreated);
+        }
+
+        public async Task<IResult> ResetPasswordAsync(string token, string newPassword)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(newPassword))
+                return new ErrorResult(Messages.TokenOrPasswordCannotBeEmpty);
+
+            var user = await _userRepository.GetByResetTokenAsync(token); // bu metod aşağıda izah olunub
+            if (user == null)
+                return new ErrorResult(Messages.InvalidResetToken);
+
+            if (user.PasswordResetTokenExpiry < DateTime.UtcNow)
+                return new ErrorResult(Messages.ResetTokenExpired);
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = DateTime.MinValue;
+
+            await _userRepository.UpdateAsync(user);
+            //burada emaile token gonderile biler
+           // var resetLink = $"https://yourapp.com/reset-password?token={token}";
+            return new SuccessResult(Messages.PasswordResetSuccess);
+        }
+
         public async Task<IDataResult<AppUserDto>> GetByIdAsync(int id)
         {
             var userById = await _userRepository.GetByIdAsync(id);
@@ -71,6 +131,12 @@ namespace EHealthBridgeAPI.Persistence.Services
 
             var newuser= _mapper.Map<AppUser>(registerRequestDto);
             newuser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequestDto.Password);
+
+            var token = Guid.NewGuid().ToString(); // Sadə token, JWT də istifadə oluna bilər
+            var expiry = DateTime.UtcNow.AddMinutes(30);
+
+            newuser.PasswordResetToken = token;
+            newuser.PasswordResetTokenExpiry = expiry;
             var createdUser = await _userRepository.InsertAsync(newuser);
 
             if (createdUser == 0)

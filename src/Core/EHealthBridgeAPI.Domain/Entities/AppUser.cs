@@ -25,6 +25,12 @@ namespace EHealthBridgeAPI.Domain.Entities
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
 
+        // Şifrə sıfırlama üçün əlavə sahələr
+        [Column("password_reset_token")]
+        public string? PasswordResetToken { get; set; }
+
+        [Column("password_reset_token_expiry")]
+        public DateTime? PasswordResetTokenExpiry { get; set; }
         public AppUser() { }
 
         public AppUser(string username, string email, string passwordHash,

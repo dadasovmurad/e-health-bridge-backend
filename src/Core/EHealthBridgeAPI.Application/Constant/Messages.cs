@@ -18,5 +18,18 @@
         public const string UserNotDeleted = "User could not be deleted";
 
         public const string UserAlreadyExists = "User already exists";
+
+        // ✅ Password reset mesajları
+        public const string PasswordResetTokenCreated = "Password reset token successfully generated";
+        public const string PasswordResetTokenInvalid = "Invalid or expired reset token";
+        public const string PasswordResetSuccess = "Password successfully reset";
+        public const string PasswordResetTokenExpired = "Reset token has expired";
+        public const string EmailCannotEmpty = "Email cannot be empty";
+        public const string EmailNotFound = "Email not found";
+        public const string PasswordCannotBeEmpty = "Password cannot be empty";
+        public const string TokenCannotBeEmpty = "Reset token cannot be empty";
+        public const string TokenOrPasswordCannotBeEmpty = "Token or new password cannot be empty.";
+        public const string InvalidResetToken = "The reset token is invalid.";
+        public const string ResetTokenExpired = "The reset token has expired.";
     }
 }

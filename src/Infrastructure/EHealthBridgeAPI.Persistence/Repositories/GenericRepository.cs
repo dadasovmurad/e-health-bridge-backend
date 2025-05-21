@@ -74,7 +74,7 @@ namespace EHealthBridgeAPI.Persistence.Repositories
 
         public async Task<bool> UpdateAsync(T entity)
         {
-            var param = DapperParamBuilder.BuildParameters(entity);
+            var param = DapperParamBuilder.BuildParameters(entity, includeId: true);
 
             var setClause = string.Join(", ", _columnNames.Select(c => $"{c} = @{c.Trim('"')}"));
             var sql = $@"
@@ -84,8 +84,17 @@ namespace EHealthBridgeAPI.Persistence.Repositories
                 ";
 
             using var connection = _context.CreateConnection();
-            var affected = await connection.ExecuteAsync(sql, param);
-            return affected > 0;
+            try
+            {
+                var affected = await connection.ExecuteAsync(sql, param);
+                return affected > 0;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
 
         public async Task<bool> DeleteAsync(int id)
