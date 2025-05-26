@@ -5,7 +5,7 @@ namespace EHealthBridgeAPI.Application.Abstractions.Token
 {
     public interface ITokenHandler
     {
-        TokenDto CreateAccessToken(int second, AppUser appUser);
+        Task<TokenDto> CreateAccessToken(int second, AppUser appUser);
         string CreateRefreshToken();
     }
 }

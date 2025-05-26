@@ -30,6 +30,7 @@ namespace EHealthBridgeAPI.Domain.Entities
         public string? RefreshToken { get; set; }
         [Column("refresh_token_expiration")]
         public DateTime? RefreshTokenExpiration { get; set; }
+
         public AppUser() { }
 
         public AppUser(int id, string username, string email, string passwordHash,

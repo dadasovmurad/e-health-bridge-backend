@@ -8,7 +8,6 @@ using Core.Results;
 using AutoMapper;
 using EHealthBridgeAPI.Application.Repositories;
 
-
 namespace EHealthBridgeAPI.Persistence.Services
 {
     public class AuthService : IAuthService
@@ -18,7 +17,7 @@ namespace EHealthBridgeAPI.Persistence.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         
-        public AuthService(IUserService userService, ITokenHandler tokenHandler,IMapper mapper, IUserRepository userRepository)
+        public AuthService(IUserService userService, ITokenHandler tokenHandler, IMapper mapper, IUserRepository userRepository)
         {
             _userService = userService;
             _tokenHandler = tokenHandler;
@@ -35,12 +34,13 @@ namespace EHealthBridgeAPI.Persistence.Services
             }
             var user = requestUser.Data;
 
-            if (!BCrypt.Net.BCrypt.Verify(internalLoginRequestDto.Password, user!.PasswordHash)) // user is not null (validated earlier in UserService)
+            if (!BCrypt.Net.BCrypt.Verify(internalLoginRequestDto.Password, user!.PasswordHash))
             {
                 return new ErrorDataResult<LoginDto>(Messages.LoginFailure);
             }
+
             var newuser = _mapper.Map<AppUser>(user);
-            var token = _tokenHandler.CreateAccessToken(3600, newuser);
+            var token = await _tokenHandler.CreateAccessToken(3600, newuser);
             newuser.PasswordResetTokenExpiry = DateTime.MinValue;
             newuser.RefreshToken = token.RefreshToken;
             newuser.RefreshTokenExpiration = token.Expiration.AddMinutes(5);
@@ -57,7 +57,7 @@ namespace EHealthBridgeAPI.Persistence.Services
 
             var user = await _userRepository.GetByEmailAsync(email);
 
-            var token = Guid.NewGuid().ToString(); 
+            var token = Guid.NewGuid().ToString();
             var expiry = DateTime.UtcNow.AddMinutes(30);
 
             user.PasswordResetToken = token;
@@ -65,7 +65,6 @@ namespace EHealthBridgeAPI.Persistence.Services
 
             await _userRepository.UpdateAsync(user);
 
-            // Əgər mail göndərmək olsaydı, burada göndəriləcəkdi
             return new SuccessResult(Messages.PasswordResetTokenCreated);
         }
 
@@ -74,20 +73,19 @@ namespace EHealthBridgeAPI.Persistence.Services
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(newPassword))
                 return new ErrorResult(Messages.TokenOrPasswordCannotBeEmpty);
 
-            var user = await _userRepository.GetByResetTokenAsync(token); 
+            var user = await _userRepository.GetByResetTokenAsync(token);
             if (user == null)
                 return new ErrorResult(Messages.InvalidResetToken);
 
             if (user.PasswordResetTokenExpiry < DateTime.UtcNow)
-                return new ErrorResult(Messages.ResetTokenExpired);
+                return new ErrorResult(Messages.TokenExpired);
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
             user.PasswordResetToken = null;
-            user.PasswordResetTokenExpiry = DateTime.MinValue;
+            user.PasswordResetTokenExpiry = null;
 
             await _userRepository.UpdateAsync(user);
-            //burada emaile token gonderile biler
-            // var resetLink = $"https://yourapp.com/reset-password?token={token}";
+
             return new SuccessResult(Messages.PasswordResetSuccess);
         }
 
