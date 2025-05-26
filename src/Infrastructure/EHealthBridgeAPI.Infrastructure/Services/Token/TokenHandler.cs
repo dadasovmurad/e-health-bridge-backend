@@ -30,7 +30,6 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
 
             SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha256);
 
-            //Oluşturulacak token ayarlarını veriyoruz.
             var expiration = DateTime.UtcNow.AddSeconds(second);
             JwtSecurityToken securityToken = new(
                 audience: _configuration["Token:Audience"],
@@ -41,11 +40,8 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
                 claims: new List<Claim> { new(ClaimTypes.Name, user.Username) }
                 );
 
-            //Token oluşturucu sınıfından bir örnek alalım.
             JwtSecurityTokenHandler tokenHandler = new();
             var accessToken = tokenHandler.WriteToken(securityToken);
-
-            //string refreshToken = CreateRefreshToken();
 
             return new(accessToken,expiration);
         }
