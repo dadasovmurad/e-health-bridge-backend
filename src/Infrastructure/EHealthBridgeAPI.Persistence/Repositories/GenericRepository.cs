@@ -1,13 +1,12 @@
-﻿using Dapper;
-using EHealthBridgeAPI.Application.Extensions;
-using EHealthBridgeAPI.Application.Repositories;
-using EHealthBridgeAPI.Application.Utilities;
-using EHealthBridgeAPI.Domain.Entities.Common;
-using EHealthBridgeAPI.Persistence.Contexts.Dapper;
+﻿using EHealthBridgeAPI.Persistence.Contexts.Dapper;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
+using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.Extensions;
+using EHealthBridgeAPI.Domain.Entities.Common;
+using EHealthBridgeAPI.Application.Utilities;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using System.Data;
+using Dapper;
 
 namespace EHealthBridgeAPI.Persistence.Repositories
 {

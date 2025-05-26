@@ -1,7 +1,6 @@
 ﻿using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Abstractions.Token;
 using EHealthBridgeAPI.Application.DTOs.Auth;
-using EHealthBridgeAPI.Persistence.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EHealthBridgeAPI.API.Controllers

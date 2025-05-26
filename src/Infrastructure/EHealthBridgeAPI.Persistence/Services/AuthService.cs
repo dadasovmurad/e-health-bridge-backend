@@ -1,13 +1,13 @@
 ﻿using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Abstractions.Token;
+using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.DTOs.Auth;
 using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.DTOs;
 using EHealthBridgeAPI.Domain.Entities;
 using Core.Results;
 using AutoMapper;
-using EHealthBridgeAPI.Application.Repositories;
-using EHealthBridgeAPI.Application.DTOs.User;
 
 
 namespace EHealthBridgeAPI.Persistence.Services

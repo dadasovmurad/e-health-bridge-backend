@@ -1,17 +1,11 @@
-﻿using Core.Results;
-using EHealthBridgeAPI.Application.Abstractions.Token;
-using EHealthBridgeAPI.Application.Constant;
-using EHealthBridgeAPI.Domain.Entities;
+﻿using EHealthBridgeAPI.Application.Abstractions.Token;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+using EHealthBridgeAPI.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
+using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EHealthBridgeAPI.Infrastructure.Services.Token
 {
