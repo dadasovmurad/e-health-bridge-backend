@@ -7,6 +7,7 @@ using EHealthBridgeAPI.Domain.Entities;
 using Core.Results;
 using AutoMapper;
 using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.DTOs.User;
 
 
 namespace EHealthBridgeAPI.Persistence.Services
@@ -17,8 +18,8 @@ namespace EHealthBridgeAPI.Persistence.Services
         private readonly ITokenHandler _tokenHandler;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
-        
-        public AuthService(IUserService userService, ITokenHandler tokenHandler,IMapper mapper, IUserRepository userRepository)
+
+        public AuthService(IUserService userService, ITokenHandler tokenHandler, IMapper mapper, IUserRepository userRepository)
         {
             _userService = userService;
             _tokenHandler = tokenHandler;
@@ -51,13 +52,12 @@ namespace EHealthBridgeAPI.Persistence.Services
 
         public async Task<IResult> GeneratePasswordResetTokenAsync(string email)
         {
-            var userResult = await _userService.GetByEmailAsync(email);
-            if (!userResult.IsSuccess)
-                return new ErrorResult(userResult.Message);
-
             var user = await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+                return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
 
-            var token = Guid.NewGuid().ToString(); 
+
+            var token = Guid.NewGuid().ToString();
             var expiry = DateTime.UtcNow.AddMinutes(30);
 
             user.PasswordResetToken = token;
@@ -74,7 +74,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(newPassword))
                 return new ErrorResult(Messages.TokenOrPasswordCannotBeEmpty);
 
-            var user = await _userRepository.GetByResetTokenAsync(token); 
+            var user = await _userRepository.GetByResetTokenAsync(token);
             if (user == null)
                 return new ErrorResult(Messages.InvalidResetToken);
 
