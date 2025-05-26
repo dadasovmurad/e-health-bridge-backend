@@ -31,5 +31,6 @@
         public const string TokenOrPasswordCannotBeEmpty = "Token or new password cannot be empty.";
         public const string InvalidResetToken = "The reset token is invalid.";
         public const string ResetTokenExpired = "The reset token has expired.";
+        public const string RefreshTokenExpired = "The refresh token is invalid.";
     }
 }

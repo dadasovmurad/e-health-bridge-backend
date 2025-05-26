@@ -66,49 +66,6 @@ namespace EHealthBridgeAPI.Persistence.Services
             return new SuccessDataResult<AppUserDto>(appUserDto);
         }
 
-        public async Task<IResult> GeneratePasswordResetTokenAsync(string email)
-        {
-            var userResult = await GetByEmailAsync(email);
-            if (!userResult.IsSuccess)
-                return new ErrorResult(userResult.Message);
-
-            var user = await _userRepository.GetByEmailAsync(email);
-
-            var token = Guid.NewGuid().ToString(); // Sadə token, JWT də istifadə oluna bilər
-            var expiry = DateTime.UtcNow.AddMinutes(30);
-
-            user.PasswordResetToken = token;
-            user.PasswordResetTokenExpiry = expiry;
-
-            await _userRepository.UpdateAsync(user);
-
-            // Əgər mail göndərmək olsaydı, burada göndəriləcəkdi
-
-            return new SuccessResult(Messages.PasswordResetTokenCreated);
-        }
-
-        public async Task<IResult> ResetPasswordAsync(string token, string newPassword)
-        {
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(newPassword))
-                return new ErrorResult(Messages.TokenOrPasswordCannotBeEmpty);
-
-            var user = await _userRepository.GetByResetTokenAsync(token); // bu metod aşağıda izah olunub
-            if (user == null)
-                return new ErrorResult(Messages.InvalidResetToken);
-
-            if (user.PasswordResetTokenExpiry < DateTime.UtcNow)
-                return new ErrorResult(Messages.ResetTokenExpired);
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-            user.PasswordResetToken = null;
-            user.PasswordResetTokenExpiry = DateTime.MinValue;
-
-            await _userRepository.UpdateAsync(user);
-            //burada emaile token gonderile biler
-           // var resetLink = $"https://yourapp.com/reset-password?token={token}";
-            return new SuccessResult(Messages.PasswordResetSuccess);
-        }
-
         public async Task<IDataResult<AppUserDto>> GetByIdAsync(int id)
         {
             var userById = await _userRepository.GetByIdAsync(id);

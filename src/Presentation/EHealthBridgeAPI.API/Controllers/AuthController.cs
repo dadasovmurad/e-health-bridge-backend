@@ -25,23 +25,27 @@ namespace EHealthBridgeAPI.API.Controllers
             return GetResponseResult(await _authService.LoginAsync(internalLoginRequestDto));
         }
 
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
+        {
+            var result = await _authService.RefreshTokenAsync(request.RefreshToken);
+            return GetResponseResult(result);
+        }
 
-        // 1. Token yaradılması üçün e-poçta əsaslanan endpoint
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
         {
-            var result = await _userService.GeneratePasswordResetTokenAsync(model.Email);
+            var result = await _authService.GeneratePasswordResetTokenAsync(model.Email);
             if (!result.IsSuccess)
                 return BadRequest(result.Message);
 
             return Ok(result.Message);
         }
 
-        // 2. Yeni şifrə təyin olunması üçün endpoint
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto model)
         {
-            var result = await _userService.ResetPasswordAsync(model.Token, model.NewPassword);
+            var result = await _authService.ResetPasswordAsync(model.Token, model.NewPassword);
             if (!result.IsSuccess)
                 return BadRequest(result.Message);
 

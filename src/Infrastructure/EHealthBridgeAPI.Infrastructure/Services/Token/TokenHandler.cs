@@ -45,9 +45,17 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
             JwtSecurityTokenHandler tokenHandler = new();
             var accessToken = tokenHandler.WriteToken(securityToken);
 
-            //string refreshToken = CreateRefreshToken();
+            string refreshToken = CreateRefreshToken();
 
-            return new(accessToken,expiration);
+            return new(accessToken, expiration, refreshToken);
+        }
+
+        public string CreateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
         }
     }
 }

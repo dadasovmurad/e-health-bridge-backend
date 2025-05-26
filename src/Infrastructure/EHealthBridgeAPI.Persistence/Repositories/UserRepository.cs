@@ -46,6 +46,25 @@ namespace EHealthBridgeAPI.Persistence.Repositories
             }
         }
 
+        public async Task<AppUser?> GetByRefreshTokenAsync(string refreshToken)
+        {
+            var sql = @" SELECT * FROM app_users WHERE refresh_token = @refreshToken";
+
+            using var connection = _context.CreateConnection();
+            try
+            {
+                var rawRows = await connection.QueryFirstOrDefaultAsync(
+                    sql,
+                    new { refreshToken }
+                );
+                return SnakeCaseMapper.MapTo<AppUser>(rawRows);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<AppUser?> GetByResetTokenAsync(string token)
         {
             var sql = @"

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EHealthBridgeAPI.Application.Abstractions.Services.Authentications;
+﻿using EHealthBridgeAPI.Application.Abstractions.Services.Authentications;
+using EHealthBridgeAPI.Application.DTOs;
+using Core.Results;
 
 namespace EHealthBridgeAPI.Application.Abstractions.Services
 {
-    public interface IAuthService:IInternalAuthentication
+    public interface IAuthService : IInternalAuthentication
     {
+        Task<IResult> GeneratePasswordResetTokenAsync(string email);
+        Task<IResult> ResetPasswordAsync(string token, string newPassword);
+        Task<IDataResult<TokenDto>> RefreshTokenAsync(string refreshToken);
     }
 }

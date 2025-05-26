@@ -7,5 +7,6 @@ namespace EHealthBridgeAPI.Application.Repositories
         Task<AppUser> GetByUsernameAsync(string username);
         Task<AppUser?> GetByEmailAsync(string email);
         Task<AppUser?> GetByResetTokenAsync(string token);
+        Task<AppUser?> GetByRefreshTokenAsync(string refreshToken);
     }
 }
