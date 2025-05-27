@@ -39,19 +39,29 @@ namespace EHealthBridgeAPI.Persistence.Repositories
 
         public async Task<int> InsertAsync(T entity)
         {
-            var param = DapperParamBuilder.BuildParameters(entity);
 
-            var columns = string.Join(", ", _columnNames);
-            var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"')));
+            try
+            {
+                var param = DapperParamBuilder.BuildParameters(entity);
 
-            var sql = $@"
+                var columns = string.Join(", ", _columnNames);
+                var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"')));
+
+                var sql = $@"
                 INSERT INTO {_tableName} ({columns})
                 VALUES ({parameters})
                 RETURNING id;
             ";
 
-            using var connection = _context.CreateConnection();
-            return await connection.ExecuteScalarAsync<int>(sql, param);
+                using var connection = _context.CreateConnection();
+                return await connection.ExecuteScalarAsync<int>(sql, param);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
