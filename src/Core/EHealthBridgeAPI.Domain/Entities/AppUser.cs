@@ -1,5 +1,5 @@
-﻿using EHealthBridgeAPI.Domain.Entities.Common;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using EHealthBridgeAPI.Domain.Entities.Common;
 
 namespace EHealthBridgeAPI.Domain.Entities
 {

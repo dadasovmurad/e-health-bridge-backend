@@ -1,7 +1,6 @@
 ﻿using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Abstractions.Token;
 using EHealthBridgeAPI.Application.DTOs.Auth;
-using EHealthBridgeAPI.Persistence.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EHealthBridgeAPI.API.Controllers
@@ -26,10 +25,9 @@ namespace EHealthBridgeAPI.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto internalLoginRequestDto)
         {
-            var result = await _authService.RefreshTokenAsync(request.RefreshToken);
-            return GetResponseResult(result);
+            return GetResponseResult(await _authService.RefreshTokenAsync(internalLoginRequestDto.RefreshToken));
         }
 
         [HttpPost("forgot-password")]

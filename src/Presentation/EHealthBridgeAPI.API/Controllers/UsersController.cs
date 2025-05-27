@@ -1,6 +1,7 @@
 ﻿using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Abstractions.Token;
 using EHealthBridgeAPI.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EHealthBridgeAPI.API.Controllers
@@ -41,7 +42,7 @@ namespace EHealthBridgeAPI.API.Controllers
             return GetResponseResult(await _userService.RemoveByIdAsync(id));
         }
 
-        //[Authorize(AuthenticationSchemes = "Admin")]
+        [Authorize(AuthenticationSchemes = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {

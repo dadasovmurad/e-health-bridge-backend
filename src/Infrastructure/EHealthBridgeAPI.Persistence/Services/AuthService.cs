@@ -1,12 +1,13 @@
 ﻿using EHealthBridgeAPI.Application.Abstractions.Services;
 using EHealthBridgeAPI.Application.Abstractions.Token;
+using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.DTOs.User;
 using EHealthBridgeAPI.Application.DTOs.Auth;
 using EHealthBridgeAPI.Application.Constant;
 using EHealthBridgeAPI.Application.DTOs;
 using EHealthBridgeAPI.Domain.Entities;
 using Core.Results;
 using AutoMapper;
-using EHealthBridgeAPI.Application.Repositories;
 
 namespace EHealthBridgeAPI.Persistence.Services
 {
@@ -51,11 +52,10 @@ namespace EHealthBridgeAPI.Persistence.Services
 
         public async Task<IResult> GeneratePasswordResetTokenAsync(string email)
         {
-            var userResult = await _userService.GetByEmailAsync(email);
-            if (!userResult.IsSuccess)
-                return new ErrorResult(userResult.Message);
-
             var user = await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+                return new ErrorDataResult<AppUserDto>(Messages.UserNotFound);
+
 
             var token = Guid.NewGuid().ToString();
             var expiry = DateTime.UtcNow.AddMinutes(30);

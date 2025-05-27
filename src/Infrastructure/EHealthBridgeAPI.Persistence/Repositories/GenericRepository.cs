@@ -1,13 +1,12 @@
-﻿using Dapper;
-using EHealthBridgeAPI.Application.Extensions;
-using EHealthBridgeAPI.Application.Repositories;
-using EHealthBridgeAPI.Application.Utilities;
-using EHealthBridgeAPI.Domain.Entities.Common;
-using EHealthBridgeAPI.Persistence.Contexts.Dapper;
+﻿using EHealthBridgeAPI.Persistence.Contexts.Dapper;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
+using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Application.Extensions;
+using EHealthBridgeAPI.Domain.Entities.Common;
+using EHealthBridgeAPI.Application.Utilities;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using System.Data;
+using Dapper;
 
 namespace EHealthBridgeAPI.Persistence.Repositories
 {
@@ -40,19 +39,29 @@ namespace EHealthBridgeAPI.Persistence.Repositories
 
         public async Task<int> InsertAsync(T entity)
         {
-            var param = DapperParamBuilder.BuildParameters(entity);
 
-            var columns = string.Join(", ", _columnNames);
-            var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"')));
+            try
+            {
+                var param = DapperParamBuilder.BuildParameters(entity);
 
-            var sql = $@"
+                var columns = string.Join(", ", _columnNames);
+                var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"')));
+
+                var sql = $@"
                 INSERT INTO {_tableName} ({columns})
                 VALUES ({parameters})
                 RETURNING id;
             ";
 
-            using var connection = _context.CreateConnection();
-            return await connection.ExecuteScalarAsync<int>(sql, param);
+                using var connection = _context.CreateConnection();
+                return await connection.ExecuteScalarAsync<int>(sql, param);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()

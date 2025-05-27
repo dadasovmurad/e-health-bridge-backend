@@ -94,6 +94,7 @@ namespace EHealthBridgeAPI.Persistence.Services
 
             newuser.PasswordResetToken = token;
             newuser.PasswordResetTokenExpiry = expiry;
+            newuser.RefreshTokenExpiration = expiry;
             var createdUser = await _userRepository.InsertAsync(newuser);
 
             if (createdUser == 0)
