@@ -41,7 +41,7 @@ namespace EHealthBridgeAPI.Persistence.Services
                 return new ErrorDataResult<LoginDto>(Messages.LoginFailure);
             }
             var newuser = _mapper.Map<AppUser>(user);
-            var token = _tokenHandler.CreateAccessToken(3600, newuser);
+            var token = _tokenHandler.CreateAccessToken(120, newuser);
             newuser.PasswordResetTokenExpiry = DateTime.MinValue;
             newuser.RefreshToken = token.RefreshToken;
             newuser.RefreshTokenExpiration = token.Expiration.AddMinutes(5);
