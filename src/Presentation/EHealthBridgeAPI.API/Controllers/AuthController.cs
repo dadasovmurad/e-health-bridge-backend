@@ -24,7 +24,7 @@ namespace EHealthBridgeAPI.API.Controllers
             return GetResponseResult(await _authService.LoginAsync(internalLoginRequestDto));
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto internalLoginRequestDto)
         {
             return GetResponseResult(await _authService.RefreshTokenAsync(internalLoginRequestDto.RefreshToken));
