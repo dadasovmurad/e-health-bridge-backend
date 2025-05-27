@@ -19,7 +19,6 @@
 
         public const string UserAlreadyExists = "User already exists";
 
-        // ✅ Password reset mesajları
         public const string PasswordResetTokenCreated = "Password reset token successfully generated";
         public const string PasswordResetTokenInvalid = "Invalid or expired reset token";
         public const string PasswordResetSuccess = "Password successfully reset";
@@ -32,5 +31,7 @@
         public const string InvalidResetToken = "The reset token is invalid.";
         public const string ResetTokenExpired = "The reset token has expired.";
         public const string RefreshTokenExpired = "The refresh token is invalid.";
+
+        public const string TokenExpired = "The refresh token has expired.";
     }
 }

@@ -27,7 +27,7 @@ namespace EHealthBridgeAPI.Infrastructure.Services.Token
             _roleRepository = roleRepository;
         }
 
-        public async Task<Application.DTOs.TokenDto> CreateAccessToken(int second, AppUser user)
+        public async Task<Application.DTOs.TokenDto> CreateAccessTokenAsync(int second, AppUser user)
         {
             SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]));
             SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha256);

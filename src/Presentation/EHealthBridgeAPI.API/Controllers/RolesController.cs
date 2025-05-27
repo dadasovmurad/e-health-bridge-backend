@@ -6,7 +6,7 @@ namespace EHealthBridgeAPI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")] // Only admins can manage roles
+    //[Authorize(Roles = "Admin")] // Only admins can manage roles
     public class RolesController : BaseApiController
     {
         private readonly IRoleService _roleService;
@@ -33,7 +33,7 @@ namespace EHealthBridgeAPI.API.Controllers
         {
             return GetResponseResult(await _roleService.GetByNameAsync(name));
         }
-
+        [Authorize(Roles = "User",AuthenticationSchemes ="Admin")] // Only admins can manage roles
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserRoles(int userId)
         {

@@ -40,7 +40,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             }
 
             var newuser = _mapper.Map<AppUser>(user);
-            var token = await _tokenHandler.CreateAccessToken(3600, newuser);
+            var token = await _tokenHandler.CreateAccessTokenAsync(3600, newuser);
             newuser.PasswordResetTokenExpiry = DateTime.MinValue;
             newuser.RefreshToken = token.RefreshToken;
             newuser.RefreshTokenExpiration = token.Expiration.AddMinutes(5);
@@ -98,7 +98,7 @@ namespace EHealthBridgeAPI.Persistence.Services
                 return new ErrorDataResult<TokenDto>(Messages.RefreshTokenExpired);
             }
 
-            var token = _tokenHandler.CreateAccessToken(3600, user);
+            var token = await _tokenHandler.CreateAccessTokenAsync(3600, user);
             user.RefreshToken = token.RefreshToken;
             user.RefreshTokenExpiration = token.Expiration.AddMinutes(5);
             user.PasswordResetTokenExpiry = DateTime.MinValue;
