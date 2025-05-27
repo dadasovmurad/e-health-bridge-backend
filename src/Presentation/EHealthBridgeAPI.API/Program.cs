@@ -30,17 +30,17 @@ namespace EHealthBridgeAPI.API
             {
                 options.TokenValidationParameters = new()
                 {
-                    ValidateAudience = true, //Oluþturulacak token deðerini kimlerin/hangi originlerin/sitelerin kullanýcý belirlediðimiz deðerdir. -> www.bilmemne.com
-                    ValidateIssuer = true, //Oluþturulacak token deðerini kimin daðýttýný ifade edeceðimiz alandýr. -> www.myapi.com
-                    ValidateLifetime = true, //Oluþturulan token deðerinin süresini kontrol edecek olan doðrulamadýr.
-                    ValidateIssuerSigningKey = true, //Üretilecek token deðerinin uygulamamýza ait bir deðer olduðunu ifade eden suciry key verisinin doðrulanmasýdýr.
+                    ValidateAudience = true, //Oluï¿½turulacak token deï¿½erini kimlerin/hangi originlerin/sitelerin kullanï¿½cï¿½ belirlediï¿½imiz deï¿½erdir. -> www.bilmemne.com
+                    ValidateIssuer = true, //Oluï¿½turulacak token deï¿½erini kimin daï¿½ï¿½ttï¿½nï¿½ ifade edeceï¿½imiz alandï¿½r. -> www.myapi.com
+                    ValidateLifetime = true, //Oluï¿½turulan token deï¿½erinin sï¿½resini kontrol edecek olan doï¿½rulamadï¿½r.
+                    ValidateIssuerSigningKey = true, //ï¿½retilecek token deï¿½erinin uygulamamï¿½za ait bir deï¿½er olduï¿½unu ifade eden suciry key verisinin doï¿½rulanmasï¿½dï¿½r.
 
                     ValidAudience = builder.Configuration["Token:Audience"],
                     ValidIssuer = builder.Configuration["Token:Issuer"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"])),
                     LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => expires != null ? expires > DateTime.UtcNow : false,
 
-                    NameClaimType = ClaimTypes.Name //JWT üzerinde Name claimne karþýlýk gelen deðeri User.Identity.Name propertysinden elde edebiliriz.
+                    NameClaimType = ClaimTypes.Name //JWT ï¿½zerinde Name claimne karï¿½ï¿½lï¿½k gelen deï¿½eri User.Identity.Name propertysinden elde edebiliriz.
                 };
             });
 
@@ -48,6 +48,8 @@ namespace EHealthBridgeAPI.API
             builder.Services.AddSwaggerGen();
             var app = builder.Build();
 
+            //global exception middleware
+            app.UseGlobalExceptionMiddleware();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -56,8 +58,6 @@ namespace EHealthBridgeAPI.API
 
             // app.UseHttpsRedirection(); // optional, for HTTP to HTTPS
 
-            //global exception middleware
-            app.UseGlobalExceptionMiddleware();
 
            
             app.UseAuthentication();

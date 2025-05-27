@@ -23,7 +23,9 @@ public static class SnakeCaseMapper
 
                 if (dict.TryGetValue(columnName, out var value) && value != null && prop.CanWrite)
                 {
-                    prop.SetValue(entity, Convert.ChangeType(value, prop.PropertyType));
+                    //prop.SetValue(entity, Convert.ChangeType(value, prop.PropertyType));
+                    var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+                    prop.SetValue(entity, value == null ? null : Convert.ChangeType(value, targetType));
                 }
             }
 
@@ -48,7 +50,9 @@ public static class SnakeCaseMapper
 
             if (dict.TryGetValue(columnName, out var value) && value != null && prop.CanWrite)
             {
-                prop.SetValue(entity, Convert.ChangeType(value, prop.PropertyType));
+                //prop.SetValue(entity, Convert.ChangeType(value, prop.PropertyType));
+                var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+                prop.SetValue(entity, value == null ? null : Convert.ChangeType(value, targetType));
             }
         }
 

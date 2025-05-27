@@ -49,6 +49,23 @@ namespace EHealthBridgeAPI.Persistence.Services
             return new SuccessDataResult<AppUserDto>(appUserDto);
         }
 
+        public async Task<IDataResult<AppUserDto>> GetByEmailAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return new ErrorDataResult<AppUserDto>(Messages.EmailCannotEmpty);
+            }
+
+            var user = await _userRepository.GetByEmailAsync(email); // repository-də olmalıdır
+            if (user == null)
+            {
+                return new ErrorDataResult<AppUserDto>(Messages.EmailNotFound);
+            }
+
+            var appUserDto = _mapper.Map<AppUserDto>(user);
+            return new SuccessDataResult<AppUserDto>(appUserDto);
+        }
+
         public async Task<IDataResult<AppUserDto>> GetByIdAsync(int id)
         {
             var userById = await _userRepository.GetByIdAsync(id);
@@ -71,6 +88,13 @@ namespace EHealthBridgeAPI.Persistence.Services
 
             var newuser= _mapper.Map<AppUser>(registerRequestDto);
             newuser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequestDto.Password);
+
+            var token = Guid.NewGuid().ToString(); // Sadə token, JWT də istifadə oluna bilər
+            var expiry = DateTime.UtcNow.AddMinutes(30);
+
+            newuser.PasswordResetToken = token;
+            newuser.PasswordResetTokenExpiry = expiry;
+            newuser.RefreshTokenExpiration = expiry;
             var createdUser = await _userRepository.InsertAsync(newuser);
 
             if (createdUser == 0)

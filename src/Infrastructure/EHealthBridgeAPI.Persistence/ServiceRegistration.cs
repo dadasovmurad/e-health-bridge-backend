@@ -21,6 +21,8 @@ namespace EHealthBridgeAPI.Persistence
             services.AddScoped<IUserService,UserService>();
             services.AddScoped<IAuthService,AuthService>();
             services.AddScoped<IUserRepository,UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IRoleService, RoleService>();
             //services.AddScoped<IGenericRepository, GenericRepository>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 

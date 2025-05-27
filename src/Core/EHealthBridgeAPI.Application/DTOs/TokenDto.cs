@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EHealthBridgeAPI.Application.DTOs
+﻿namespace EHealthBridgeAPI.Application.DTOs
 {
-    public record TokenDto(string AccessToken, DateTime Expiration);
+    public record TokenDto(string AccessToken, DateTime Expiration, string RefreshToken);
 }

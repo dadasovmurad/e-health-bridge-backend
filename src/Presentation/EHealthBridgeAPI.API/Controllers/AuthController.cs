@@ -11,16 +11,43 @@ namespace EHealthBridgeAPI.API.Controllers
     {
         public readonly ITokenHandler _tokenHandler;
         private readonly IAuthService _authService;
-
-        public AuthController(ITokenHandler tokenHandler, IAuthService authService)
+        private readonly IUserService _userService;
+        public AuthController(ITokenHandler tokenHandler, IAuthService authService, IUserService userService)
         {
             _tokenHandler = tokenHandler;
             _authService = authService;
+            _userService = userService;
         }
         [HttpPost("[action]")]
         public async Task<IActionResult> Login([FromBody] InternalLoginRequestDto internalLoginRequestDto)
         {
             return GetResponseResult(await _authService.LoginAsync(internalLoginRequestDto));
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto internalLoginRequestDto)
+        {
+            return GetResponseResult(await _authService.RefreshTokenAsync(internalLoginRequestDto.RefreshToken));
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
+        {
+            var result = await _authService.GeneratePasswordResetTokenAsync(model.Email);
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Message);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto model)
+        {
+            var result = await _authService.ResetPasswordAsync(model.Token, model.NewPassword);
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Message);
         }
     }
 }

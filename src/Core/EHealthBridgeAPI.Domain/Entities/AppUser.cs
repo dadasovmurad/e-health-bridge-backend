@@ -1,11 +1,5 @@
-﻿using EHealthBridgeAPI.Domain.Entities.Common;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using EHealthBridgeAPI.Domain.Entities.Common;
 
 namespace EHealthBridgeAPI.Domain.Entities
 {
@@ -25,11 +19,24 @@ namespace EHealthBridgeAPI.Domain.Entities
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
 
+        // Şifrə sıfırlama üçün əlavə sahələr
+        [Column("password_reset_token")]
+        public string? PasswordResetToken { get; set; }
+
+        [Column("password_reset_token_expiry")]
+        public DateTime? PasswordResetTokenExpiry { get; set; }
+
+        [Column("refresh_token")]
+        public string? RefreshToken { get; set; }
+        [Column("refresh_token_expiration")]
+        public DateTime? RefreshTokenExpiration { get; set; }
+
         public AppUser() { }
 
-        public AppUser(string username, string email, string passwordHash,
+        public AppUser(int id, string username, string email, string passwordHash,
                    string firstName, string lastName)
         {
+            Id = id;
             Username = username;
             Email = email;
             PasswordHash = passwordHash;

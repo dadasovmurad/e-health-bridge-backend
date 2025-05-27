@@ -18,5 +18,6 @@ namespace EHealthBridgeAPI.Application.Abstractions.Services
         Task<IDataResult<AppUserDto>> GetByUsernameAsync(string username);
         Task<IResult> UpdateAsync(int id, UpdateUserRequestDto updateUserRequestDto);
         Task<IResult> RemoveByIdAsync(int id);
+        Task<IDataResult<AppUserDto>> GetByEmailAsync(string email);
     }
 }

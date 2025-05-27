@@ -22,6 +22,72 @@ namespace EHealthBridgeAPI.Persistence.Repositories
         {
             _context = context;
         }
+
+        public async Task<AppUser?> GetByEmailAsync(string email)
+        {
+            var sql = @"
+            SELECT * FROM app_users 
+            WHERE email = @email";
+            // Get the Npgsql connection from EF Core
+            using var connection = _context.CreateConnection();
+            try
+            {
+                var rawRows = await connection.QueryFirstOrDefaultAsync(
+                    sql,
+                    new { Email = email }
+                );
+                return SnakeCaseMapper.MapTo<AppUser>(rawRows);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public async Task<AppUser?> GetByRefreshTokenAsync(string refreshToken)
+        {
+            var sql = @" SELECT * FROM app_users WHERE refresh_token = @refreshToken";
+
+            using var connection = _context.CreateConnection();
+            try
+            {
+                var rawRows = await connection.QueryFirstOrDefaultAsync(
+                    sql,
+                    new { refreshToken }
+                );
+                return SnakeCaseMapper.MapTo<AppUser>(rawRows);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<AppUser?> GetByResetTokenAsync(string token)
+        {
+            var sql = @"
+            SELECT * FROM app_users 
+            WHERE password_reset_token = @token";
+
+            // Get the Npgsql connection from EF Core
+            using var connection = _context.CreateConnection();
+            try
+            {
+                var rawRows = await connection.QueryFirstOrDefaultAsync(
+                    sql,
+                    new {  token }
+                );
+                return SnakeCaseMapper.MapTo<AppUser>(rawRows);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
         public async Task<AppUser> GetByUsernameAsync(string username)
         {
             var sql = @"
