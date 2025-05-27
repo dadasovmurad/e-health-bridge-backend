@@ -1,4 +1,19 @@
 -- Create roles table
+CREATE TABLE IF NOT EXISTS public.app_users
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    username text COLLATE pg_catalog."default" NOT NULL,
+    email text COLLATE pg_catalog."default" NOT NULL,
+    password_hash text COLLATE pg_catalog."default" NOT NULL,
+    first_name text COLLATE pg_catalog."default" NOT NULL,
+    last_name text COLLATE pg_catalog."default" NOT NULL,
+    is_active boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT app_users_pkey PRIMARY KEY (id)
+)
+
+
 CREATE TABLE IF NOT EXISTS public.roles (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL UNIQUE,
@@ -23,16 +38,13 @@ VALUES
     ('User', 'Regular user with basic access')
 ON CONFLICT (name) DO NOTHING;
 
-CREATE TABLE IF NOT EXISTS public.app_users
-(
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-    username text COLLATE pg_catalog."default" NOT NULL,
-    email text COLLATE pg_catalog."default" NOT NULL,
-    password_hash text COLLATE pg_catalog."default" NOT NULL,
-    first_name text COLLATE pg_catalog."default" NOT NULL,
-    last_name text COLLATE pg_catalog."default" NOT NULL,
-    is_active boolean NOT NULL DEFAULT true,
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
-    CONSTRAINT app_users_pkey PRIMARY KEY (id)
-)
+
+
+ALTER TABLE app_users 
+ADD COLUMN password_reset_token VARCHAR(255),
+ADD COLUMN password_reset_token_expiry TIMESTAMP,
+ADD COLUMN refresh_token VARCHAR(500),
+ADD COLUMN refresh_token_expiration TIMESTAMP;
+
+CREATE INDEX idx_app_users_password_reset_token ON app_users(password_reset_token);
+CREATE INDEX idx_app_users_refresh_token ON app_users(refresh_token);
