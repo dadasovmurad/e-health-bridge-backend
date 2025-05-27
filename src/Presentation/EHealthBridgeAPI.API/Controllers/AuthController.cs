@@ -24,13 +24,6 @@ namespace EHealthBridgeAPI.API.Controllers
             return GetResponseResult(await _authService.LoginAsync(internalLoginRequestDto));
         }
 
-        [HttpPost("[action]")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto request)
-        {
-            var result = await _authService.RefreshTokenAsync(request.RefreshToken);
-            return GetResponseResult(result);
-        }
-
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
         {
