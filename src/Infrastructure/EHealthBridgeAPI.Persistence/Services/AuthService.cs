@@ -82,7 +82,7 @@ namespace EHealthBridgeAPI.Persistence.Services
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
             user.PasswordResetToken = null;
-            user.PasswordResetTokenExpiry = null;
+            user.PasswordResetTokenExpiry = DateTime.MinValue; ;
 
             await _userRepository.UpdateAsync(user);
 
@@ -101,7 +101,7 @@ namespace EHealthBridgeAPI.Persistence.Services
             var token = await _tokenHandler.CreateAccessTokenAsync(3600, user);
             user.RefreshToken = token.RefreshToken;
             user.RefreshTokenExpiration = token.Expiration.AddMinutes(5);
-            user.PasswordResetTokenExpiry = DateTime.MinValue;
+            //user.PasswordResetTokenExpiry = DateTime.MinValue;
             await _userRepository.UpdateAsync(user);
 
             return new SuccessDataResult<TokenDto>(token, "Token yeniləndi.");

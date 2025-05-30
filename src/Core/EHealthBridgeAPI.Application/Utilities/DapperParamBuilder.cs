@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using EHealthBridgeAPI.Domain.Entities.Common;
+using System.Reflection;
+using System;
+using Dapper;
 
 namespace EHealthBridgeAPI.Application.Utilities
 {

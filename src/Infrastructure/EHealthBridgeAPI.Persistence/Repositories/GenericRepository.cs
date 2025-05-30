@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using EHealthBridgeAPI.Application.Repositories;
 using EHealthBridgeAPI.Application.Extensions;
 using EHealthBridgeAPI.Domain.Entities.Common;
-using EHealthBridgeAPI.Application.Utilities;
 using System.Reflection;
 using System.Data;
 using Dapper;
@@ -42,8 +41,6 @@ namespace EHealthBridgeAPI.Persistence.Repositories
 
             try
             {
-                var param = DapperParamBuilder.BuildParameters(entity);
-
                 var columns = string.Join(", ", _columnNames);
                 var parameters = string.Join(", ", _columnNames.Select(c => "@" + c.Trim('"')));
 
@@ -54,7 +51,7 @@ namespace EHealthBridgeAPI.Persistence.Repositories
             ";
 
                 using var connection = _context.CreateConnection();
-                return await connection.ExecuteScalarAsync<int>(sql, param);
+                return await connection.ExecuteScalarAsync<int>(sql, entity);
             }
             catch (Exception ex)
             {
@@ -69,33 +66,33 @@ namespace EHealthBridgeAPI.Persistence.Repositories
             var sql = $"SELECT * FROM {_tableName}";
             using var connection = _context.CreateConnection();
 
-            var rawRows = await connection.QueryAsync(sql); // dynamic
-            return SnakeCaseMapper.MapTo<T>(rawRows);
+           return  await connection.QueryAsync<T>(sql); // dynamic
         }
 
         public async Task<T> GetByIdAsync(int id)
         {
             var sql = $"SELECT * FROM {_tableName} WHERE id = @id";
             using var connection = _context.CreateConnection();
-            var rawRows = await connection.QueryFirstOrDefaultAsync(sql, new { id });
-            return SnakeCaseMapper.MapTo<T>(rawRows);
+            return await connection.QueryFirstOrDefaultAsync<T>(sql, new { id });
         }
 
         public async Task<bool> UpdateAsync(T entity)
         {
-            var param = DapperParamBuilder.BuildParameters(entity, includeId: true);
+            var properties = typeof(T).GetProperties()
+                             .Where(p => p.Name != "Id");
 
-            var setClause = string.Join(", ", _columnNames.Select(c => $"{c} = @{c.Trim('"')}"));
-            var sql = $@"
+            var setClause = string.Join(", ",
+      properties.Select(p => $"{p.Name.ToSnakeCase()} = @{p.Name}"));
+
+                    var sql = $@"
                 UPDATE {_tableName}
                 SET {setClause}
-                WHERE id = @Id
-                ";
+                WHERE id = @Id";
 
             using var connection = _context.CreateConnection();
             try
             {
-                var affected = await connection.ExecuteAsync(sql, param);
+                var affected = await connection.ExecuteAsync(sql, entity);
                 return affected > 0;
 
             }

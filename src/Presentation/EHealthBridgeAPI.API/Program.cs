@@ -24,7 +24,7 @@ namespace EHealthBridgeAPI.API
 
             builder.Services.AddValidatorsFromAssemblyContaining<UserDtoValidator>();
             builder.Services.AddFluentValidationAutoValidation();
-
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
             services.AddControllers();
             services.AddPersistenceServices();
             services.AddInfrastructureServices();

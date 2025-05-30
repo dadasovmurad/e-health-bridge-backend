@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Dapper;
+﻿using Dapper;
 using EHealthBridgeAPI.Application.Repositories;
-using EHealthBridgeAPI.Application.Utilities;
 using EHealthBridgeAPI.Domain.Entities;
 using EHealthBridgeAPI.Persistence.Contexts.Dapper;
 using static Dapper.SqlMapper;
@@ -32,12 +24,10 @@ namespace EHealthBridgeAPI.Persistence.Repositories
             using var connection = _context.CreateConnection();
             try
             {
-                var rawRows = await connection.QueryFirstOrDefaultAsync(
+                return  await connection.QueryFirstOrDefaultAsync<AppUser>(
                     sql,
                     new { Email = email }
                 );
-                return SnakeCaseMapper.MapTo<AppUser>(rawRows);
-
             }
             catch (Exception ex)
             {
@@ -53,11 +43,10 @@ namespace EHealthBridgeAPI.Persistence.Repositories
             using var connection = _context.CreateConnection();
             try
             {
-                var rawRows = await connection.QueryFirstOrDefaultAsync(
+                return  await connection.QueryFirstOrDefaultAsync<AppUser>(
                     sql,
                     new { refreshToken }
                 );
-                return SnakeCaseMapper.MapTo<AppUser>(rawRows);
             }
             catch (Exception ex)
             {
@@ -75,11 +64,10 @@ namespace EHealthBridgeAPI.Persistence.Repositories
             using var connection = _context.CreateConnection();
             try
             {
-                var rawRows = await connection.QueryFirstOrDefaultAsync(
+               return  await connection.QueryFirstOrDefaultAsync<AppUser>(
                     sql,
-                    new {  token }
+                    new { token }
                 );
-                return SnakeCaseMapper.MapTo<AppUser>(rawRows);
             }
             catch (Exception ex)
             {
@@ -96,12 +84,10 @@ namespace EHealthBridgeAPI.Persistence.Repositories
 
             // Get the Npgsql connection from EF Core
             using var connection = _context.CreateConnection();
-
-            var rawRows = await connection.QueryFirstOrDefaultAsync(
-                sql,
-                new { Username = username }
-            );
-            return SnakeCaseMapper.MapTo<AppUser>(rawRows);
+            return await connection.QueryFirstOrDefaultAsync<AppUser>(
+                     sql,
+                     new { Username = username }
+                 );
         }
     }
 }
