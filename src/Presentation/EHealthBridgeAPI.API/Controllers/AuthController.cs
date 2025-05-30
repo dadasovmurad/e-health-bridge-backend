@@ -33,21 +33,13 @@ namespace EHealthBridgeAPI.API.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
         {
-            var result = await _authService.GeneratePasswordResetTokenAsync(model.Email);
-            if (!result.IsSuccess)
-                return BadRequest(result.Message);
-
-            return Ok(result.Message);
+            return GetResponseResult(await _authService.GeneratePasswordResetTokenAsync(model.Email));
         }
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto model)
         {
-            var result = await _authService.ResetPasswordAsync(model.Token, model.NewPassword);
-            if (!result.IsSuccess)
-                return BadRequest(result.Message);
-
-            return Ok(result.Message);
+            return GetResponseResult(await _authService.ResetPasswordAsync(model.Token, model.NewPassword));
         }
     }
 }
