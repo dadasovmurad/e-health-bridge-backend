@@ -1,8 +1,7 @@
-using Dapper;
-using EHealthBridgeAPI.Application.Repositories;
-using EHealthBridgeAPI.Application.Utilities;
-using EHealthBridgeAPI.Domain.Entities;
 using EHealthBridgeAPI.Persistence.Contexts.Dapper;
+using EHealthBridgeAPI.Application.Repositories;
+using EHealthBridgeAPI.Domain.Entities;
+using Dapper;
 
 namespace EHealthBridgeAPI.Persistence.Repositories
 {
@@ -22,8 +21,7 @@ namespace EHealthBridgeAPI.Persistence.Repositories
                 WHERE name = @name";
 
             using var connection = _context.CreateConnection();
-            var rawRows = await connection.QueryFirstOrDefaultAsync(sql, new { name });
-            return SnakeCaseMapper.MapTo<Role>(rawRows);
+            return  await connection.QueryFirstOrDefaultAsync<Role>(sql, new { name });
         }
 
         public async Task<IEnumerable<Role>> GetUserRolesAsync(int userId)
@@ -34,8 +32,7 @@ namespace EHealthBridgeAPI.Persistence.Repositories
                 WHERE ur.user_id = @userId";
 
             using var connection = _context.CreateConnection();
-            var rawRows = await connection.QueryAsync(sql, new { userId });
-            return SnakeCaseMapper.MapTo<Role>(rawRows);
+            return  await connection.QueryAsync<Role>(sql, new { userId });
         }
 
         public async Task<bool> AssignRoleToUserAsync(int userId, int roleId)
