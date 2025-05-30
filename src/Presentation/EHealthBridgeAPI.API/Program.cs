@@ -6,6 +6,9 @@ using System.Security.Claims;
 using System.Text;
 using EHealthBridgeAPI.API.Extensions;
 using EHealthBridgeAPI.Application.Features.Profiles;
+using EHealthBridgeAPI.Application.Validators;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 namespace EHealthBridgeAPI.API
 {
@@ -18,6 +21,9 @@ namespace EHealthBridgeAPI.API
             // Add services to the container.
 
             var services = builder.Services;
+
+            builder.Services.AddValidatorsFromAssemblyContaining<UserDtoValidator>();
+            builder.Services.AddFluentValidationAutoValidation();
 
             services.AddControllers();
             services.AddPersistenceServices();
